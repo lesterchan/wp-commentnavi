@@ -36,7 +36,7 @@ Example: `Pages 1 of 20: [1] 2 3 4 ... Last`
 * NEW: Use _n() Instead Of __ngettext() And _n_noop() Instead Of __ngettext_noop()
 * FIXED: Removed "&amp;#8201;" Entity
 
-### Version 1.00 (12-12-2008)</strong>
+### Version 1.00 (12-12-2008)
 * NEW: Initial Release
 
 ## Installation
