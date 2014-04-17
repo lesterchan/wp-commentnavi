@@ -3,7 +3,7 @@ Contributors: GamerZ
 Donate link: http://lesterchan.net/site/donation/  
 Tags: commentnavi, navi, navigation, wp-commentnavi, page  
 Requires at least: 2.8  
-Tested up to: 3.5  
+Tested up to: 3.9  
 Stable tag: trunk  
 
 Adds a more advanced paging navigation for your comments to your WordPress 2.8 and above blog.
@@ -12,17 +12,11 @@ Adds a more advanced paging navigation for your comments to your WordPress 2.8 a
 
 Example: `Pages 1 of 20: [1] 2 3 4 ... Last`
 
-### Previous Versions
-* [WP-CommentNavi 1.00 For WordPress 2.7.x](http://downloads.wordpress.org/plugin/wp-commentnavi.1.00.zip "WP-CommentNavi 1.00 For WordPress 2.7.x")
-
 ### Development
-* [http://dev.wp-plugins.org/browser/wp-commentnavi/](http://dev.wp-plugins.org/browser/wp-commentnavi/ "http://dev.wp-plugins.org/browser/wp-commentnavi/")
+* [https://github.com/lesterchan/wp-commentnavi](https://github.com/lesterchan/wp-commentnavi "https://github.com/lesterchan/wp-commentnavi")
 
 ### Translations
 * [http://dev.wp-plugins.org/browser/wp-commentnavi/i18n/](http://dev.wp-plugins.org/browser/wp-commentnavi/i18n/ "http://dev.wp-plugins.org/browser/wp-commentnavi/i18n/")
-
-### Support Forums
-* [http://forums.lesterchan.net/index.php?board=30.0](http://forums.lesterchan.net/index.php?board=30.0 "http://forums.lesterchan.net/index.php?board=30.0")
 
 ### Donations
 * I spent most of my free time creating, updating, maintaining and supporting these plugins, if you really love my plugins and could spare me a couple of bucks, I will really appericiate it. If not feel free to use it without any obligations.
