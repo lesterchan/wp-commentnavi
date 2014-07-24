@@ -9,8 +9,10 @@ Stable tag: trunk
 Adds a more advanced paging navigation for your comments to your WordPress 2.8 and above blog.
 
 ## Description
-
 Example: `Pages 1 of 20: [1] 2 3 4 ... Last`
+
+### Build Status
+[![Build Status](https://travis-ci.org/lesterchan/wp-commentnavi.svg?branch=master)](https://travis-ci.org/lesterchan/wp-commentnavi)
 
 ### Development
 * [https://github.com/lesterchan/wp-commentnavi](https://github.com/lesterchan/wp-commentnavi "https://github.com/lesterchan/wp-commentnavi")
