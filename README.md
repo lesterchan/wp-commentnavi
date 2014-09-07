@@ -6,7 +6,7 @@ Requires at least: 2.8
 Tested up to: 4.0  
 Stable tag: trunk  
 
-Adds a more advanced paging navigation for your comments to your WordPress 2.8 and above blog.
+Adds a more advanced paging navigation for your comments to your WordPress blog.
 
 ## Description
 Example: `Pages 1 of 20: [1] 2 3 4 ... Last`
@@ -69,9 +69,8 @@ N/A
 
 ## Screenshots
 
-1. Admin
-2. First Page
-3. Last Page
+1. Admin - CommentNavi Options
+2. Default CommentNavi Style
 
 ## Frequently Asked Questions
 
