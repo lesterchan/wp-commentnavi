@@ -20,7 +20,7 @@
 ### Variables Variables Variables
 $base_name = plugin_basename('wp-commentnavi/commentnavi-options.php');
 $base_page = 'admin.php?page='.$base_name;
-$mode = trim($_GET['mode']);
+$mode = isset($_GET['mode']) ? trim($_GET['mode']) : '';
 $commentnavi_settings = array('commentnavi_options');
 
 
