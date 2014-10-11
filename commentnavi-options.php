@@ -1,27 +1,7 @@
 <?php
-/*
-+----------------------------------------------------------------+
-|																							|
-|	WordPress 2.8 Plugin: WP-CommentNavi 1.10							|
-|	Copyright (c) 2009 Lester "GaMerZ" Chan									|
-|																							|
-|	File Written By:																	|
-|	- Lester "GaMerZ" Chan															|
-|	- http://lesterchan.net															|
-|																							|
-|	File Information:																	|
-|	- Comment Navigation Options Page											|
-|	- wp-content/plugins/wp-commentnavi/commentnavi-options.php	|
-|																							|
-+----------------------------------------------------------------+
-*/
-
-
 ### Variables Variables Variables
 $base_name = plugin_basename('wp-commentnavi/commentnavi-options.php');
 $base_page = 'admin.php?page='.$base_name;
-$mode = isset($_GET['mode']) ? trim($_GET['mode']) : '';
-$commentnavi_settings = array('commentnavi_options');
 
 ### Form Processing 
 if(!empty($_POST['Submit'])) {
