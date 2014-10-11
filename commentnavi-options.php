@@ -26,12 +26,12 @@ if(!empty($_POST['Submit'])) {
 	$text = '';
 	foreach($update_commentnavi_queries as $update_commentnavi_query) {
 		if($update_commentnavi_query) {
-			$text .= '<font color="green">'.$update_commentnavi_text[$i].' '.__('Updated', 'wp-commentnavi').'</font><br />';
+			$text .= '<p style="color: green;">'.$update_commentnavi_text[$i].' '.__('Updated', 'wp-commentnavi').'</p>';
 		}
 		$i++;
 	}
 	if(empty($text)) {
-		$text = '<font color="red">'.__('No Comment Navigation Option Updated', 'wp-commentnavi').'</font>';
+		$text = '<p style="color: red;">'.__('No Comment Navigation Option Updated', 'wp-commentnavi').'</p>';
 	}
 }
 
