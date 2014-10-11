@@ -3,7 +3,7 @@
 Plugin Name: WP-CommentNavi
 Plugin URI: http://lesterchan.net/portfolio/programming/php/
 Description: Adds a more advanced paging navigation for your comments to your WordPress 2.7 and above blog.
-Version: 1.10
+Version: 1.11
 Author: Lester 'GaMerZ' Chan
 Author URI: http://lesterchan.net
 Text Domain: wp-commentnavi
@@ -11,7 +11,7 @@ Text Domain: wp-commentnavi
 
 
 /*
-	Copyright 2013  Lester Chan  (email : lesterchan@gmail.com)
+	Copyright 2014  Lester Chan  (email : lesterchan@gmail.com)
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -30,9 +30,9 @@ Text Domain: wp-commentnavi
 
 
 ### Create Text Domain For Translations
-add_action('init', 'commentnavi_textdomain');
+add_action( 'plugins_loaded', 'polls_textdomain' );
 function commentnavi_textdomain() {
-	load_plugin_textdomain('wp-commentnavi', false, 'wp-commentnavi');
+	load_plugin_textdomain( 'wp-commentnavi', false, dirname( plugin_basename( __FILE__ ) ) );
 }
 
 
@@ -186,10 +186,32 @@ function wp_commentnavi_dropdown() {
 }
 
 
-### Function: Comment Navigation Options
-add_action('activate_wp-commentnavi/wp-commentnavi.php', 'commentnavi_init');
-function commentnavi_init() {
-	commentnavi_textdomain();
+### Function: Activate Plugin
+register_activation_hook( __FILE__, 'commentnavi_activation' );
+function commentnavi_activation( $network_wide )
+{
+	if ( is_multisite() && $network_wide )
+	{
+		$ms_sites = wp_get_sites();
+
+		if( 0 < sizeof( $ms_sites ) )
+		{
+			foreach ( $ms_sites as $ms_site )
+			{
+				switch_to_blog( $ms_site['blog_id'] );
+				commentnavi_activate();
+			}
+		}
+
+		restore_current_blog();
+	}
+	else
+	{
+		commentnavi_activate();
+	}
+}
+
+function commentnavi_activate() {
 	// Add Options
 	$commentnavi_options = array();
 	$commentnavi_options['pages_text'] = __('Page %CURRENT_PAGE% of %TOTAL_PAGES%','wp-commentnavi');

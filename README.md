@@ -3,7 +3,7 @@ Contributors: GamerZ
 Donate link: http://lesterchan.net/site/donation/  
 Tags: commentnavi, navi, navigation, wp-commentnavi, page  
 Requires at least: 2.8  
-Tested up to: 4.0  
+Tested up to: 4.1  
 Stable tag: trunk  
 
 Adds a more advanced paging navigation for your comments to your WordPress blog.
@@ -27,6 +27,9 @@ Example: `Pages 1 of 20: [1] 2 3 4 ... Last`
 * I spent most of my free time creating, updating, maintaining and supporting these plugins, if you really love my plugins and could spare me a couple of bucks, I will really appericiate it. If not feel free to use it without any obligations.
 
 ## Changelog
+### Version 1.11
+* NEW: Supports WordPress Mutisite Network Activation
+* NEW: Uses WordPress native uninstall.php
 
 ### Version 1.10 (01-06-2009)
 * NEW: Works For WordPress 2.8
