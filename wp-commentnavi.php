@@ -3,7 +3,7 @@
 Plugin Name: WP-CommentNavi
 Plugin URI: http://lesterchan.net/portfolio/programming/php/
 Description: Adds a more advanced paging navigation for your comments to your WordPress 2.7 and above blog.
-Version: 1.11
+Version: 1.12
 Author: Lester 'GaMerZ' Chan
 Author URI: http://lesterchan.net
 Text Domain: wp-commentnavi
@@ -30,7 +30,7 @@ Text Domain: wp-commentnavi
 
 
 ### Create Text Domain For Translations
-add_action( 'plugins_loaded', 'polls_textdomain' );
+add_action( 'plugins_loaded', 'commentnavi_textdomain' );
 function commentnavi_textdomain() {
 	load_plugin_textdomain( 'wp-commentnavi', false, dirname( plugin_basename( __FILE__ ) ) );
 }

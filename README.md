@@ -27,6 +27,9 @@ Example: `Pages 1 of 20: [1] 2 3 4 ... Last`
 * I spent most of my free time creating, updating, maintaining and supporting these plugins, if you really love my plugins and could spare me a couple of bucks, I will really appericiate it. If not feel free to use it without any obligations.
 
 ## Changelog
+### Version 1.12
+* FIXED: commentnavi_textdomain instead of polls_textdomain. Props slightlydifferent.
+
 ### Version 1.11
 * NEW: Supports WordPress Mutisite Network Activation
 * NEW: Uses WordPress native uninstall.php
