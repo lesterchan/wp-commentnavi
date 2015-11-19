@@ -11,7 +11,7 @@ Text Domain: wp-commentnavi
 
 
 /*
-	Copyright 2014  Lester Chan  (email : lesterchan@gmail.com)
+	Copyright 2015  Lester Chan  (email : lesterchan@gmail.com)
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -131,7 +131,7 @@ function wp_commentnavi($before = '', $after = '') {
 				}
 				if ($start_page >= 2 && $pages_to_show < $max_page) {
 					$first_page_text = str_replace("%TOTAL_PAGES%", number_format_i18n($max_page), $commentnavi_options['first_text']);
-					echo '<a href="'.clean_url(get_comments_pagenum_link()).'" class="first" title="'.$first_page_text.'">'.$first_page_text.'</a>';
+					echo '<a href="'.esc_url(get_comments_pagenum_link()).'" class="first" title="'.$first_page_text.'">'.$first_page_text.'</a>';
 					if(!empty($commentnavi_options['dotleft_text'])) {
 						echo '<span class="extend">'.$commentnavi_options['dotleft_text'].'</span>';
 					}
@@ -143,7 +143,7 @@ function wp_commentnavi($before = '', $after = '') {
 						echo '<span class="current">'.$current_page_text.'</span>';
 					} else {
 						$page_text = str_replace("%PAGE_NUMBER%", number_format_i18n($i), $commentnavi_options['page_text']);
-						echo '<a href="'.clean_url(get_comments_pagenum_link($i)).'" class="page" title="'.$page_text.'">'.$page_text.'</a>';
+						echo '<a href="'.esc_url(get_comments_pagenum_link($i)).'" class="page" title="'.$page_text.'">'.$page_text.'</a>';
 					}
 				}
 				next_comments_link($commentnavi_options['next_text'], $max_page);
@@ -152,7 +152,7 @@ function wp_commentnavi($before = '', $after = '') {
 						echo '<span class="extend">'.$commentnavi_options['dotright_text'].'</span>';
 					}
 					$last_page_text = str_replace("%TOTAL_PAGES%", number_format_i18n($max_page), $commentnavi_options['last_text']);
-					echo '<a href="'.clean_url(get_comments_pagenum_link($max_page)).'" class="last" title="'.$last_page_text.'">'.$last_page_text.'</a>';
+					echo '<a href="'.esc_url(get_comments_pagenum_link($max_page)).'" class="last" title="'.$last_page_text.'">'.$last_page_text.'</a>';
 				}
 				break;
 			case 2;
@@ -165,10 +165,10 @@ function wp_commentnavi($before = '', $after = '') {
 					}
 					if($i == $paged) {
 						$current_page_text = str_replace("%PAGE_NUMBER%", number_format_i18n($i), $commentnavi_options['current_text']);
-						echo '<option value="'.clean_url(get_comments_pagenum_link($page_num)).'" selected="selected" class="current">'.$current_page_text."</option>\n";
+						echo '<option value="'.esc_url(get_comments_pagenum_link($page_num)).'" selected="selected" class="current">'.$current_page_text."</option>\n";
 					} else {
 						$page_text = str_replace("%PAGE_NUMBER%", number_format_i18n($i), $commentnavi_options['page_text']);
-						echo '<option value="'.clean_url(get_comments_pagenum_link($page_num)).'">'.$page_text."</option>\n";
+						echo '<option value="'.esc_url(get_comments_pagenum_link($page_num)).'">'.$page_text."</option>\n";
 					}
 				}
 				echo "</select>\n";
@@ -188,25 +188,19 @@ function wp_commentnavi_dropdown() {
 
 ### Function: Activate Plugin
 register_activation_hook( __FILE__, 'commentnavi_activation' );
-function commentnavi_activation( $network_wide )
-{
-	if ( is_multisite() && $network_wide )
-	{
+function commentnavi_activation( $network_wide ) {
+	if ( is_multisite() && $network_wide ) {
 		$ms_sites = wp_get_sites();
 
-		if( 0 < sizeof( $ms_sites ) )
-		{
-			foreach ( $ms_sites as $ms_site )
-			{
+		if( 0 < sizeof( $ms_sites ) ) {
+			foreach ( $ms_sites as $ms_site ) {
 				switch_to_blog( $ms_site['blog_id'] );
 				commentnavi_activate();
 			}
 		}
 
 		restore_current_blog();
-	}
-	else
-	{
+	} else {
 		commentnavi_activate();
 	}
 }
@@ -228,4 +222,3 @@ function commentnavi_activate() {
 	$commentnavi_options['always_show'] = 0;
 	add_option('commentnavi_options', $commentnavi_options, 'CommentNavi Options');
 }
-?>
