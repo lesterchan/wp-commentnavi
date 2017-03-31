@@ -11,9 +11,6 @@ Adds a more advanced paging navigation for your comments to your WordPress blog.
 ## Description
 Example: `Pages 1 of 20: [1] 2 3 4 ... Last`
 
-### Build Status
-[![Build Status](https://travis-ci.org/lesterchan/wp-commentnavi.svg?branch=master)](https://travis-ci.org/lesterchan/wp-commentnavi)
-
 ### General Usage
 1. Open `wp-content/themes/<YOUR THEME NAME>/comments.php`
 2. Add: `<?php if(function_exists('wp_commentnavi')) { wp_commentnavi(); } ?>`
@@ -23,6 +20,9 @@ Example: `Pages 1 of 20: [1] 2 3 4 ... Last`
 * WP-CommentNavi will load `commentnavi-css.css` from your theme's directory if it exists.
 * If it doesn't exists, it will just load the default 'commentnavi-css.css' that comes with WP-CommentNavi.
 * This will allow you to upgrade WP-CommentNavi without worrying about overwriting your page navigation styles that you have create
+
+### Build Status
+[![Build Status](https://travis-ci.org/lesterchan/wp-commentnavi.svg?branch=master)](https://travis-ci.org/lesterchan/wp-commentnavi)
 
 ### Development
 * [https://github.com/lesterchan/wp-commentnavi](https://github.com/lesterchan/wp-commentnavi "https://github.com/lesterchan/wp-commentnavi")
