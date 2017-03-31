@@ -18,6 +18,7 @@ Example: `Pages 1 of 20: [1] 2 3 4 ... Last`
 1. Open `wp-content/themes/<YOUR THEME NAME>/comments.php`
 2. Add: `<?php if(function_exists('wp_commentnavi')) { wp_commentnavi(); } ?>`
 3. Go to `WP-Admin -> Settings-> CommentNavi` to configure WP-CommentNavi
+
 * If you need to configure the CSS style of WP-CommentNavi, open and edit: `commentnavi-css.css`
 * WP-CommentNavi will load `commentnavi-css.css` from your theme's directory if it exists.
 * If it doesn't exists, it will just load the default 'commentnavi-css.css' that comes with WP-CommentNavi.
