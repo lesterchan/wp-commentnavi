@@ -14,6 +14,15 @@ Example: `Pages 1 of 20: [1] 2 3 4 ... Last`
 ### Build Status
 [![Build Status](https://travis-ci.org/lesterchan/wp-commentnavi.svg?branch=master)](https://travis-ci.org/lesterchan/wp-commentnavi)
 
+### General Usage
+1. Open `wp-content/themes/<YOUR THEME NAME>/comments.php`
+2. Add: `<?php if(function_exists('wp_commentnavi')) { wp_commentnavi(); } ?>`
+3. Go to `WP-Admin -> Settings-> CommentNavi` to configure WP-CommentNavi
+* If you need to configure the CSS style of WP-CommentNavi, open and edit: `commentnavi-css.css`
+* WP-CommentNavi will load `commentnavi-css.css` from your theme's directory if it exists.
+* If it doesn't exists, it will just load the default 'commentnavi-css.css' that comes with WP-CommentNavi.
+* This will allow you to upgrade WP-CommentNavi without worrying about overwriting your page navigation styles that you have create
+
 ### Development
 * [https://github.com/lesterchan/wp-commentnavi](https://github.com/lesterchan/wp-commentnavi "https://github.com/lesterchan/wp-commentnavi")
 
@@ -43,35 +52,6 @@ Example: `Pages 1 of 20: [1] 2 3 4 ... Last`
 
 ### Version 1.00 (12-12-2008)
 * NEW: Initial Release
-
-## Installation
-
-1. Open `wp-content/plugins` Folder
-2. Put: `Folder: wp-commentnavi`
-3. Activate `WP-CommentNavi` Plugin
-4. Go to `WP-Admin -> Settings-> CommentNavi` to configure WP-CommentNavi
-
-### General Usage
-1. Open `wp-content/themes/<YOUR THEME NAME>/comments.php`
-2. Add:
-`<?php if(function_exists('wp_commentnavi')) { wp_commentnavi(); } ?>`
-* If you need to configure the CSS style of WP-CommentNavi, open and edit: `commentnavi-css.css`
-
-### Note
-* WP-CommentNavi will load `commentnavi-css.css` from your theme's directory if it exists.
- * If it doesn't exists, it will just load the default 'commentnavi-css.css' that comes with WP-CommentNavi.
- * This will allow you to upgrade WP-CommentNavi without worrying about overwriting your page navigation styles that you have created.
-
-## Upgrading
-
-1. Deactivate `WP-CommentNavi` Plugin
-2. Open `wp-content/plugins` Folder
-3. Put/Overwrite: `Folder: wp-commentnavi`
-4. Activate `WP-CommentNavi` Plugin
-
-## Upgrade Notice
-
-N/A
 
 ## Screenshots
 
