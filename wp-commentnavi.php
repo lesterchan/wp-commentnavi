@@ -3,14 +3,14 @@
 Plugin Name: WP-CommentNavi
 Plugin URI: https://lesterchan.net/portfolio/programming/php/
 Description: Adds a more advanced paging navigation for your comments to your WordPress 2.7 and above blog.
-Version: 1.12.1
+Version: 1.12.2
 Author: Lester 'GaMerZ' Chan
 Author URI: https://lesterchan.net
 Text Domain: wp-commentnavi
 */
 
 /*
-	Copyright 2023  Lester Chan  (email : lesterchan@gmail.com)
+    Copyright 2023  Lester Chan  (email : lesterchan@gmail.com)
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by

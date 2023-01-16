@@ -37,6 +37,9 @@ Example: `Pages 1 of 20: [1] 2 3 4 ... Last`
 * I spent most of my free time creating, updating, maintaining and supporting these plugins, if you really love my plugins and could spare me a couple of bucks, I will really appreciate it. If not feel free to use it without any obligations.
 
 ## Changelog
+### Version 1.12.2
+* FIXED: XSS. esc_attr() on form values
+
 ### Version 1.12.1
 * FIXED: XSS
 

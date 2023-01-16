@@ -48,7 +48,7 @@ $commentnavi_options = get_option('commentnavi_options');
             <tr>
                 <th scope="row" valign="top"><?php _e('Text For Number Of Pages', 'wp-commentnavi'); ?></th>
                 <td>
-                    <input type="text" name="commentnavi_pages_text" value="<?php echo stripslashes($commentnavi_options['pages_text']); ?>" size="50" /><br />
+                    <input type="text" name="commentnavi_pages_text" value="<?php echo stripslashes( esc_attr( $commentnavi_options['pages_text'] ) ); ?>" size="50" /><br />
                     %CURRENT_PAGE% - <?php _e('The current page number.', 'wp-commentnavi'); ?><br />
                     %TOTAL_PAGES% - <?php _e('The total number of pages.', 'wp-commentnavi'); ?>
                 </td>
@@ -56,53 +56,53 @@ $commentnavi_options = get_option('commentnavi_options');
             <tr>
                 <th scope="row" valign="top"><?php _e('Text For Current Page', 'wp-commentnavi'); ?></th>
                 <td>
-                    <input type="text" name="commentnavi_current_text" value="<?php echo stripslashes(htmlspecialchars($commentnavi_options['current_text'])); ?>" size="30" /><br />
+                    <input type="text" name="commentnavi_current_text" value="<?php echo stripslashes( esc_attr( $commentnavi_options['current_text'] ) ); ?>" size="30" /><br />
                     %PAGE_NUMBER% - <?php _e('The page number.', 'wp-commentnavi'); ?><br />
                 </td>
             </tr>
             <tr>
                 <th scope="row" valign="top"><?php _e('Text For Page', 'wp-commentnavi'); ?></th>
                 <td>
-                    <input type="text" name="commentnavi_page_text" value="<?php echo stripslashes(htmlspecialchars($commentnavi_options['page_text'])); ?>" size="30" /><br />
+                    <input type="text" name="commentnavi_page_text" value="<?php echo stripslashes( esc_attr( $commentnavi_options['page_text'] ) ); ?>" size="30" /><br />
                     %PAGE_NUMBER% - <?php _e('The page number.', 'wp-commentnavi'); ?><br />
                 </td>
             </tr>
             <tr>
                 <th scope="row" valign="top"><?php _e('Text For First Comment', 'wp-commentnavi'); ?></th>
                 <td>
-                    <input type="text" name="commentnavi_first_text" value="<?php echo stripslashes(htmlspecialchars($commentnavi_options['first_text'])); ?>" size="30" /><br />
+                    <input type="text" name="commentnavi_first_text" value="<?php echo stripslashes( esc_attr( $commentnavi_options['first_text'] ) ); ?>" size="30" /><br />
                     %TOTAL_PAGES% - <?php _e('The total number of pages.', 'wp-commentnavi'); ?>
                 </td>
             </tr>
             <tr>
                 <th scope="row" valign="top"><?php _e('Text For Last Comment', 'wp-commentnavi'); ?></th>
                 <td>
-                    <input type="text" name="commentnavi_last_text" value="<?php echo stripslashes(htmlspecialchars($commentnavi_options['last_text'])); ?>" size="30" /><br />
+                    <input type="text" name="commentnavi_last_text" value="<?php echo stripslashes( esc_attr( $commentnavi_options['last_text'] ) ); ?>" size="30" /><br />
                     %TOTAL_PAGES% - <?php _e('The total number of pages.', 'wp-commentnavi'); ?>
                 </td>
             </tr>
             <tr>
                 <th scope="row" valign="top"><?php _e('Text For Next Comment', 'wp-commentnavi'); ?></th>
                 <td>
-                    <input type="text" name="commentnavi_next_text" value="<?php echo stripslashes(htmlspecialchars($commentnavi_options['next_text'])); ?>" size="30" />
+                    <input type="text" name="commentnavi_next_text" value="<?php echo stripslashes( esc_attr( $commentnavi_options['next_text'] ) ); ?>" size="30" />
                 </td>
             </tr>
             <tr>
                 <th scope="row" valign="top"><?php _e('Text For Previous Comment', 'wp-commentnavi'); ?></th>
                 <td>
-                    <input type="text" name="commentnavi_prev_text" value="<?php echo stripslashes(htmlspecialchars($commentnavi_options['prev_text'])); ?>" size="30" />
+                    <input type="text" name="commentnavi_prev_text" value="<?php echo stripslashes( esc_attr( $commentnavi_options['prev_text'] ) ); ?>" size="30" />
                 </td>
             </tr>
             <tr>
                 <th scope="row" valign="top"><?php _e('Text For Next ...', 'wp-commentnavi'); ?></th>
                 <td>
-                    <input type="text" name="commentnavi_dotright_text" value="<?php echo stripslashes(htmlspecialchars($commentnavi_options['dotright_text'])); ?>" size="30" />
+                    <input type="text" name="commentnavi_dotright_text" value="<?php echo stripslashes( esc_attr( $commentnavi_options['dotright_text'] ) ); ?>" size="30" />
                 </td>
             </tr>
             <tr>
                 <th scope="row" valign="top"><?php _e('Text For Previous ...', 'wp-commentnavi'); ?></th>
                 <td>
-                    <input type="text" name="commentnavi_dotleft_text" value="<?php echo stripslashes(htmlspecialchars($commentnavi_options['dotright_text'])); ?>" size="30" />
+                    <input type="text" name="commentnavi_dotleft_text" value="<?php echo stripslashes( esc_attr($commentnavi_options['dotright_text'] ) ); ?>" size="30" />
                 </td>
             </tr>
         </table>
@@ -120,7 +120,7 @@ $commentnavi_options = get_option('commentnavi_options');
             <tr>
                 <th scope="row" valign="top"><?php _e('Number Of Pages To Show?', 'wp-commentnavi'); ?></th>
                 <td>
-                    <input type="text" name="commentnavi_num_pages" value="<?php echo stripslashes($commentnavi_options['num_pages']); ?>" size="4" />
+                    <input type="text" name="commentnavi_num_pages" value="<?php echo stripslashes( esc_attr( $commentnavi_options['num_pages'] ) ); ?>" size="4" />
                 </td>
             </tr>
             <tr>
