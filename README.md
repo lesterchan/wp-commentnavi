@@ -3,7 +3,7 @@ Contributors: GamerZ
 Donate link: http://lesterchan.net/site/donation/  
 Tags: commentnavi, navi, navigation, wp-commentnavi, page  
 Requires at least: 2.8  
-Tested up to: 6.1  
+Tested up to: 6.2  
 Stable tag: trunk  
 
 Adds a more advanced paging navigation for your comments to your WordPress blog.
