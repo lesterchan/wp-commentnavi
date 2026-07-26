@@ -1,0 +1,181 @@
+<?php
+/**
+ * Uninstaller tests.
+ *
+ * @package WP-CommentNavi
+ */
+
+/**
+ * Covers uninstall.php.
+ */
+class Test_CommentNavi_Uninstall extends WP_UnitTestCase {
+
+	/**
+	 * Every PHP file the plugin ships, for the source-level assertions below.
+	 *
+	 * @return array
+	 */
+	protected function plugin_php_files() {
+		$root  = dirname( __DIR__ );
+		$files = glob( $root . '/*.php' );
+
+		if ( is_dir( $root . '/includes' ) ) {
+			$files = array_merge( $files, glob( $root . '/includes/*.php' ) );
+		}
+
+		return $files;
+	}
+
+	/**
+	 * Running the uninstaller removes the plugin's only option row.
+	 *
+	 * @return void
+	 */
+	public function test_uninstall_deletes_the_option() {
+		update_option( 'commentnavi_options', array( 'style' => 1 ) );
+		$this->assertIsArray( get_option( 'commentnavi_options' ) );
+
+		if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
+			define( 'WP_UNINSTALL_PLUGIN', 'wp-commentnavi/wp-commentnavi.php' );
+		}
+		require_once dirname( __DIR__ ) . '/uninstall.php';
+
+		$this->assertFalse( get_option( 'commentnavi_options' ) );
+	}
+
+	/**
+	 * wp_get_sites() was removed in WordPress 5.1.
+	 *
+	 * Calling it does not degrade gracefully -- it is a fatal error, so before
+	 * 2.0.0 both network activation and multisite uninstall died outright on any
+	 * supported WordPress. A single-site suite cannot reach that code path, so
+	 * this is asserted against the source instead.
+	 *
+	 * @return void
+	 */
+	public function test_no_call_to_the_removed_wp_get_sites() {
+		foreach ( $this->plugin_php_files() as $file ) {
+			$this->assertStringNotContainsString(
+				'wp_get_sites',
+				$this->code_without_comments( $file ),
+				basename( $file ) . ' calls wp_get_sites(), which WordPress removed in 5.1.'
+			);
+		}
+	}
+
+	/**
+	 * Return a file's source with all comments removed.
+	 *
+	 * Searching raw source for a legacy symbol gets a false positive from every
+	 * comment that explains why the symbol is gone -- which is exactly the kind of
+	 * comment worth keeping. Stripping comments first means the assertion sees
+	 * only code, so the history can be written down without tripping it.
+	 *
+	 * @param string $file Absolute path to a PHP file.
+	 * @return string
+	 */
+	protected function code_without_comments( $file ) {
+		$code = '';
+
+		foreach ( token_get_all( file_get_contents( $file ) ) as $token ) {
+			if ( is_array( $token ) && in_array( $token[0], array( T_COMMENT, T_DOC_COMMENT ), true ) ) {
+				continue;
+			}
+
+			$code .= is_array( $token ) ? $token[1] : $token;
+		}
+
+		return $code;
+	}
+
+	/**
+	 * The multisite branch must ask for every site, not the first hundred.
+	 *
+	 * WP_Site_Query defaults 'number' to 100, so a network larger than that would
+	 * silently leave the option behind on every site past the hundredth. This is
+	 * asserted against the source rather than by building a 101-site network,
+	 * which the single-site suite cannot do; the assertion exists so the argument
+	 * cannot be dropped again without a failure.
+	 *
+	 * @return void
+	 */
+	public function test_multisite_uninstall_asks_for_every_site() {
+		$source = file_get_contents( dirname( __DIR__ ) . '/uninstall.php' );
+
+		$this->assertMatchesRegularExpression(
+			"/'number'\s*=>\s*0/",
+			$source,
+			"uninstall.php must pass 'number' => 0 to get_sites(), or it stops at 100 sites."
+		);
+	}
+
+	/**
+	 * restore_current_blog() has to run inside the loop, not after it.
+	 *
+	 * switch_to_blog() pushes onto a stack. Restoring once after the loop instead
+	 * of once per iteration leaves the stack wound up by every site but the last,
+	 * which leaks the switched state into whatever runs next.
+	 *
+	 * Counting the two calls is not enough to catch this -- the broken version has
+	 * one of each too, just in the wrong places -- so the foreach body is pulled
+	 * out with the tokenizer and both calls have to be found inside it.
+	 *
+	 * @return void
+	 */
+	public function test_uninstall_restores_the_blog_inside_the_loop() {
+		$body = $this->foreach_body( dirname( __DIR__ ) . '/uninstall.php' );
+
+		$this->assertNotNull( $body, 'uninstall.php has no foreach loop over the network sites.' );
+		$this->assertStringContainsString( 'switch_to_blog', $body );
+		$this->assertStringContainsString(
+			'restore_current_blog',
+			$body,
+			'restore_current_blog() must be called inside the site loop, once per switch_to_blog().'
+		);
+	}
+
+	/**
+	 * Return the source of the first foreach body in a file.
+	 *
+	 * Brace matching is done over the token stream rather than with a regular
+	 * expression, so a nested block inside the loop cannot end the match early.
+	 *
+	 * @param string $file Absolute path to a PHP file.
+	 * @return string|null The loop body, or null when there is no foreach.
+	 */
+	protected function foreach_body( $file ) {
+		$tokens = token_get_all( file_get_contents( $file ) );
+		$count  = count( $tokens );
+
+		for ( $i = 0; $i < $count; $i++ ) {
+			if ( ! is_array( $tokens[ $i ] ) || T_FOREACH !== $tokens[ $i ][0] ) {
+				continue;
+			}
+
+			// Walk to the brace that opens the loop body.
+			for ( $j = $i; $j < $count && '{' !== $tokens[ $j ]; $j++ ) {
+				continue;
+			}
+
+			$depth = 0;
+			$body  = '';
+
+			for ( ; $j < $count; $j++ ) {
+				$text = is_array( $tokens[ $j ] ) ? $tokens[ $j ][1] : $tokens[ $j ];
+
+				if ( '{' === $tokens[ $j ] ) {
+					++$depth;
+				} elseif ( '}' === $tokens[ $j ] ) {
+					--$depth;
+					if ( 0 === $depth ) {
+						return $body;
+					}
+				}
+
+				$body .= $text;
+			}
+		}
+
+		return null;
+	}
+}

@@ -45,13 +45,67 @@ function commentnavi_menu() {
 
 
 ### Function: Enqueue CommentNavi Stylesheets
-add_action('wp_print_styles', 'commentnavi_stylesheets');
+add_action('wp_enqueue_scripts', 'commentnavi_stylesheets');
 function commentnavi_stylesheets() {
-	if(@file_exists(TEMPLATEPATH.'/commentnavi-css.css')) {
-		wp_enqueue_style('wp-commentnavi', get_stylesheet_directory_uri().'/commentnavi-css.css', false, '1.10', 'all');
+	// The override was looked up in TEMPLATEPATH -- the parent theme -- but
+	// enqueued from get_stylesheet_directory_uri(), the child theme. Under a child
+	// theme those are different directories, so a parent-theme override loaded a
+	// URL with nothing behind it and a child-theme override was never found at
+	// all. Each candidate is now tested and enqueued from the same place.
+	if(file_exists(get_stylesheet_directory().'/commentnavi-css.css')) {
+		$commentnavi_css = get_stylesheet_directory_uri().'/commentnavi-css.css';
+	} elseif(file_exists(get_template_directory().'/commentnavi-css.css')) {
+		$commentnavi_css = get_template_directory_uri().'/commentnavi-css.css';
 	} else {
-		wp_enqueue_style('wp-commentnavi', plugins_url('wp-commentnavi/commentnavi-css.css'), false, '1.10', 'all');
+		// Was plugins_url('wp-commentnavi/commentnavi-css.css'), which 404s for
+		// anyone who installed the plugin under a different directory name.
+		$commentnavi_css = plugins_url('commentnavi-css.css', __FILE__);
 	}
+	wp_enqueue_style('wp-commentnavi', $commentnavi_css, array(), '1.10', 'all');
+}
+
+
+### Function: Default Option Values
+function commentnavi_default_options() {
+	return array(
+		'pages_text'    => __('Page %CURRENT_PAGE% of %TOTAL_PAGES%','wp-commentnavi'),
+		'current_text'  => '%PAGE_NUMBER%',
+		'page_text'     => '%PAGE_NUMBER%',
+		'first_text'    => __('&laquo; First','wp-commentnavi'),
+		'last_text'     => __('Last &raquo;','wp-commentnavi'),
+		'next_text'     => __('&raquo;','wp-commentnavi'),
+		'prev_text'     => __('&laquo;','wp-commentnavi'),
+		'dotright_text' => __('...','wp-commentnavi'),
+		'dotleft_text'  => __('...','wp-commentnavi'),
+		'style'         => 1,
+		'num_pages'     => 5,
+		'always_show'   => 0,
+	);
+}
+
+
+### Function: Option Keys Rendered As HTML
+function commentnavi_text_keys() {
+	return array('pages_text', 'current_text', 'page_text', 'first_text', 'last_text', 'next_text', 'prev_text', 'dotright_text', 'dotleft_text');
+}
+
+
+### Function: Read Options, Merged Over The Defaults
+function commentnavi_get_options() {
+	// Nothing merged defaults before, so a row written by an older version -- or
+	// one where a key had simply never been saved -- was read straight out of the
+	// array and raised a notice on the front end for every missing key.
+	$commentnavi_options = get_option('commentnavi_options', array());
+	$commentnavi_options = wp_parse_args(is_array($commentnavi_options) ? $commentnavi_options : array(), commentnavi_default_options());
+
+	// The text options are printed as HTML. They are filtered on save, but an
+	// option written by WP-CLI, a migration or another plugin never passes through
+	// the settings screen, so they are filtered on read as well.
+	foreach(commentnavi_text_keys() as $commentnavi_key) {
+		$commentnavi_options[$commentnavi_key] = is_scalar($commentnavi_options[$commentnavi_key]) ? wp_kses_post((string) $commentnavi_options[$commentnavi_key]) : '';
+	}
+
+	return $commentnavi_options;
 }
 
 
@@ -92,11 +146,11 @@ function wp_commentnavi_all_comments_link($text = 'View all comments', $display 
 ### Function: Comment Navigation: Boxed Style Paging
 function wp_commentnavi($before = '', $after = '') {
 	global $wp_query;
-	$comments_per_page = intval(get_query_var('comments_per_page'));
 	$paged = intval(get_query_var('cpage'));
-	$commentnavi_options = get_option('commentnavi_options');
-	$numcomments = intval($wp_query->comment_count);
-	$max_page = intval($wp_query->max_num_comment_pages);
+	$commentnavi_options = commentnavi_get_options();
+	// max(1, ...) because max_num_comment_pages is 0 on a post with no comments,
+	// and the 0 used to be carried straight into the label as "Page 1 of 0".
+	$max_page = max(1, intval($wp_query->max_num_comment_pages));
 	if(empty($paged) || $paged == 0) {
 		$paged = 1;
 	}
@@ -130,7 +184,10 @@ function wp_commentnavi($before = '', $after = '') {
 				}
 				if ($start_page >= 2 && $pages_to_show < $max_page) {
 					$first_page_text = str_replace("%TOTAL_PAGES%", number_format_i18n($max_page), $commentnavi_options['first_text']);
-					echo '<a href="'.esc_url(get_comments_pagenum_link()).'" class="first" title="'.$first_page_text.'">'.$first_page_text.'</a>';
+					// The title attribute took the option value raw. A double quote in
+					// it closed the attribute and anything after it became markup, so
+					// the settings screen was an XSS sink for anyone who could reach it.
+					echo '<a href="'.esc_url(get_comments_pagenum_link()).'" class="first" title="'.esc_attr(wp_strip_all_tags($first_page_text)).'">'.$first_page_text.'</a>';
 					if(!empty($commentnavi_options['dotleft_text'])) {
 						echo '<span class="extend">'.$commentnavi_options['dotleft_text'].'</span>';
 					}
@@ -142,7 +199,7 @@ function wp_commentnavi($before = '', $after = '') {
 						echo '<span class="current">'.$current_page_text.'</span>';
 					} else {
 						$page_text = str_replace("%PAGE_NUMBER%", number_format_i18n($i), $commentnavi_options['page_text']);
-						echo '<a href="'.esc_url(get_comments_pagenum_link($i)).'" class="page" title="'.$page_text.'">'.$page_text.'</a>';
+						echo '<a href="'.esc_url(get_comments_pagenum_link($i)).'" class="page" title="'.esc_attr(wp_strip_all_tags($page_text)).'">'.$page_text.'</a>';
 					}
 				}
 				next_comments_link($commentnavi_options['next_text'], $max_page);
@@ -151,10 +208,12 @@ function wp_commentnavi($before = '', $after = '') {
 						echo '<span class="extend">'.$commentnavi_options['dotright_text'].'</span>';
 					}
 					$last_page_text = str_replace("%TOTAL_PAGES%", number_format_i18n($max_page), $commentnavi_options['last_text']);
-					echo '<a href="'.esc_url(get_comments_pagenum_link($max_page)).'" class="last" title="'.$last_page_text.'">'.$last_page_text.'</a>';
+					echo '<a href="'.esc_url(get_comments_pagenum_link($max_page)).'" class="last" title="'.esc_attr(wp_strip_all_tags($last_page_text)).'">'.$last_page_text.'</a>';
 				}
 				break;
-			case 2;
+			// Was "case 2;" -- a semicolon, not a colon. PHP has always accepted it
+			// as a synonym, but it is deprecated as of 8.5 and due for removal.
+			case 2:
 				echo '<form action="'.admin_url('admin.php?page='.plugin_basename(__FILE__)).'" method="get">'."\n";
 				echo '<select size="1" onchange="document.location.href = this.options[this.selectedIndex].value;">'."\n";
 				for($i = 1; $i  <= $max_page; $i++) {
@@ -189,35 +248,26 @@ function wp_commentnavi_dropdown() {
 register_activation_hook( __FILE__, 'commentnavi_activation' );
 function commentnavi_activation( $network_wide ) {
 	if ( is_multisite() && $network_wide ) {
-		$ms_sites = wp_get_sites();
+		// wp_get_sites() was removed in WordPress 5.1, so network activation was a
+		// fatal error on every supported version. 'number' => 0 lifts
+		// WP_Site_Query's default cap of 100, which would otherwise skip every site
+		// past the hundredth, and restore_current_blog() belongs inside the loop
+		// because switch_to_blog() pushes onto a stack.
+		$site_ids = get_sites( array( 'fields' => 'ids', 'number' => 0 ) );
 
-		if( 0 < sizeof( $ms_sites ) ) {
-			foreach ( $ms_sites as $ms_site ) {
-				switch_to_blog( $ms_site['blog_id'] );
-				commentnavi_activate();
-			}
+		foreach ( $site_ids as $site_id ) {
+			switch_to_blog( (int) $site_id );
+			commentnavi_activate();
+			restore_current_blog();
 		}
-
-		restore_current_blog();
 	} else {
 		commentnavi_activate();
 	}
 }
 
 function commentnavi_activate() {
-	// Add Options
-	$commentnavi_options = array();
-	$commentnavi_options['pages_text'] = __('Page %CURRENT_PAGE% of %TOTAL_PAGES%','wp-commentnavi');
-	$commentnavi_options['current_text'] = '%PAGE_NUMBER%';
-	$commentnavi_options['page_text'] = '%PAGE_NUMBER%';
-	$commentnavi_options['first_text'] = __('&laquo; First','wp-commentnavi');
-	$commentnavi_options['last_text'] = __('Last &raquo;','wp-commentnavi');
-	$commentnavi_options['next_text'] = __('&raquo;','wp-commentnavi');
-	$commentnavi_options['prev_text'] = __('&laquo;','wp-commentnavi');
-	$commentnavi_options['dotright_text'] = __('...','wp-commentnavi');
-	$commentnavi_options['dotleft_text'] = __('...','wp-commentnavi');
-	$commentnavi_options['style'] = 1;
-	$commentnavi_options['num_pages'] = 5;
-	$commentnavi_options['always_show'] = 0;
-	add_option('commentnavi_options', $commentnavi_options, 'CommentNavi Options');
+	// The third argument used to be the string 'CommentNavi Options'. That
+	// parameter is add_option()'s deprecated $deprecated, not a description, and
+	// passing anything non-empty raises _deprecated_argument().
+	add_option( 'commentnavi_options', commentnavi_default_options() );
 }

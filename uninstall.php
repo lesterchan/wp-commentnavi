@@ -1,46 +1,48 @@
 <?php
-/*
- * Uninstall plugin
+/**
+ * Uninstaller: removes everything the plugin stored.
+ *
+ * @package WP-CommentNavi
  */
-if ( !defined( 'WP_UNINSTALL_PLUGIN' ) )
-	exit ();
 
-$option_names = array(
-	'commentnavi_options'
-);
-
-
-if ( is_multisite() ) {
-	$ms_sites = wp_get_sites();
-
-	if( 0 < sizeof( $ms_sites ) ) {
-		foreach ( $ms_sites as $ms_site ) {
-			switch_to_blog( $ms_site['blog_id'] );
-			if( sizeof( $option_names ) > 0 ) {
-				foreach( $option_names as $option_name ) {
-					delete_option( $option_name );
-					plugin_uninstalled();
-				}
-			}
-		}
-	}
-
-	restore_current_blog();
-} else {
-	if( sizeof( $option_names ) > 0 ) {
-		foreach( $option_names as $option_name ) {
-			delete_option( $option_name );
-			plugin_uninstalled();
-		}
-	}
+if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
+	exit();
 }
 
 /**
- * Delete plugin table when uninstalled
+ * Delete the plugin's options for the current site.
  *
- * @access public
  * @return void
  */
-function plugin_uninstalled() {
-	global $wpdb;
+function wp_commentnavi_uninstall_site() {
+	delete_option( 'commentnavi_options' );
+}
+
+if ( is_multisite() ) {
+	// Three separate bugs lived in this block before 2.0.0.
+	//
+	// wp_get_sites() was removed in WordPress 5.1, so multisite uninstall was a
+	// fatal error rather than a partial one.
+	//
+	// 'number' => 0 is required: WP_Site_Query defaults it to 100, so without it
+	// a network larger than that keeps the option on every site past the
+	// hundredth, and uninstall still reports success.
+	//
+	// restore_current_blog() has to run inside the loop. switch_to_blog() pushes
+	// onto a stack, so restoring once after the loop left it wound up by every
+	// site but the last.
+	$site_ids = get_sites(
+		array(
+			'fields' => 'ids',
+			'number' => 0,
+		)
+	);
+
+	foreach ( $site_ids as $site_id ) {
+		switch_to_blog( (int) $site_id );
+		wp_commentnavi_uninstall_site();
+		restore_current_blog();
+	}
+} else {
+	wp_commentnavi_uninstall_site();
 }
