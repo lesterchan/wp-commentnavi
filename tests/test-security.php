@@ -178,8 +178,8 @@ class Test_CommentNavi_Security extends CommentNavi_TestCase {
 	/**
 	 * With always_show on and no comment pages, the total shown is 1, not 0.
 	 *
-	 * max_num_comment_pages is 0 on a post with no comments. The old arithmetic
-	 * carried that straight into the label and printed "Page 1 of 0".
+	 * The max_num_comment_pages value is 0 on a post with no comments. The old
+	 * arithmetic carried that straight into the label and printed "Page 1 of 0".
 	 *
 	 * @return void
 	 */

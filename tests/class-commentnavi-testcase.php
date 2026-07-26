@@ -95,6 +95,8 @@ abstract class CommentNavi_TestCase extends WP_UnitTestCase {
 	 * Render the navigation for a given pagination state.
 	 *
 	 * @param array $args {
+	 *     Optional. The pagination state to render.
+	 *
 	 *     @type int    $cpage         Current comment page. Default 1.
 	 *     @type int    $max_pages     Total comment pages. Default 10.
 	 *     @type int    $comment_count Comments on this page. Default 10.

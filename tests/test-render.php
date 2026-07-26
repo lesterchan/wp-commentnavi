@@ -279,7 +279,7 @@ class Test_CommentNavi_Render extends CommentNavi_TestCase {
 	}
 
 	/**
-	 * always_show overrides the single-page suppression.
+	 * The always_show option overrides the single-page suppression.
 	 *
 	 * @return void
 	 */

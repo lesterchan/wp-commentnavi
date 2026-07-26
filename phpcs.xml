@@ -1,0 +1,52 @@
+<?xml version="1.0"?>
+<ruleset name="WP-CommentNavi">
+	<description>WordPress Coding Standards for WP-CommentNavi.</description>
+
+	<file>.</file>
+
+	<!-- WPCS has no JavaScript sniffs; never let PHPCS touch .js. -->
+	<arg name="extensions" value="php"/>
+	<arg name="basepath" value="."/>
+	<arg name="colors"/>
+	<arg value="sp"/>
+
+	<!-- Scanning these makes the CI runner run out of memory. -->
+	<exclude-pattern>/vendor/*</exclude-pattern>
+	<exclude-pattern>/node_modules/*</exclude-pattern>
+
+	<rule ref="WordPress"/>
+
+	<config name="minimum_wp_version" value="6.0"/>
+
+	<rule ref="WordPress.WP.I18n">
+		<properties>
+			<property name="text_domain" type="array">
+				<element value="wp-commentnavi"/>
+				<!-- The navigation aria-labels reuse core's own strings. -->
+				<element value="default"/>
+			</property>
+		</properties>
+	</rule>
+
+	<!-- The tests assert on the plugin's own markup, so they must not escape it. -->
+	<rule ref="WordPress.Security.EscapeOutput">
+		<exclude-pattern>/tests/*</exclude-pattern>
+	</rule>
+	<!-- The test case is a shared base class, not a test class; WPCS exempts test
+	     classes from the class-*.php naming rule but not their helpers. -->
+	<rule ref="WordPress.Files.FileName.InvalidClassFileName">
+		<exclude-pattern>/tests/*</exclude-pattern>
+	</rule>
+	<!-- The source-level assertions read the plugin's own files off local disk.
+	     wp_remote_get() is for remote URLs and WP_Filesystem abstracts over FTP
+	     and SSH; neither is what reading a file in the repo under test wants. -->
+	<rule ref="WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents">
+		<exclude-pattern>/tests/*</exclude-pattern>
+	</rule>
+	<!-- $tagName and $textContent are DOMNode's own property names, spelled by
+	     the DOM specification. Renaming them to snake_case would simply read a
+	     property that does not exist. -->
+	<rule ref="WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase">
+		<exclude-pattern>/tests/*</exclude-pattern>
+	</rule>
+</ruleset>

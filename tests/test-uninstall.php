@@ -44,7 +44,7 @@ class Test_CommentNavi_Uninstall extends WP_UnitTestCase {
 	}
 
 	/**
-	 * wp_get_sites() was removed in WordPress 5.1.
+	 * The wp_get_sites() function was removed in WordPress 5.1.
 	 *
 	 * Calling it does not degrade gracefully -- it is a fatal error, so before
 	 * 2.0.0 both network activation and multisite uninstall died outright on any
@@ -110,11 +110,11 @@ class Test_CommentNavi_Uninstall extends WP_UnitTestCase {
 	}
 
 	/**
-	 * restore_current_blog() has to run inside the loop, not after it.
+	 * Restoring the current blog has to happen inside the loop, not after it.
 	 *
-	 * switch_to_blog() pushes onto a stack. Restoring once after the loop instead
-	 * of once per iteration leaves the stack wound up by every site but the last,
-	 * which leaks the switched state into whatever runs next.
+	 * Calling switch_to_blog() pushes onto a stack. Restoring once after the loop
+	 * instead of once per iteration leaves the stack wound up by every site but
+	 * the last, which leaks the switched state into whatever runs next.
 	 *
 	 * Counting the two calls is not enough to catch this -- the broken version has
 	 * one of each too, just in the wrong places -- so the foreach body is pulled
