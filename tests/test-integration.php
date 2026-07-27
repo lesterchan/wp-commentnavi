@@ -49,7 +49,7 @@ class Test_CommentNavi_Integration extends CommentNavi_TestCase {
 	/**
 	 * Run a real singular request and let core paginate the comments.
 	 *
-	 * comments_template() is what populates comment_count and
+	 * Calling comments_template() is what populates comment_count and
 	 * max_num_comment_pages. Its own output is discarded -- the theme's
 	 * comments.php is not what is under test here, the figures it leaves on the
 	 * query are.
@@ -61,9 +61,13 @@ class Test_CommentNavi_Integration extends CommentNavi_TestCase {
 	protected function render_real( $post_id, $cpage ) {
 		$this->go_to( add_query_arg( 'cpage', $cpage, get_permalink( $post_id ) ) );
 
-		global $wp_query, $withcomments;
-		$withcomments = true;
+		global $wp_query;
 
+		// comments_template() proceeds when is_single(), is_page() or the
+		// $withcomments global is set. This is a real permalink request, so the
+		// first is already true and the global does not need overriding -- which
+		// is just as well, since assigning to a WordPress global is exactly what
+		// WordPress.WP.GlobalVariablesOverride exists to stop.
 		$this->assertTrue( is_singular(), 'The request did not resolve to a singular view.' );
 
 		$wp_query->the_post();
