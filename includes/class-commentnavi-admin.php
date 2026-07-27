@@ -224,17 +224,17 @@ class CommentNavi_Admin {
 				'type'    => 'select',
 				'choices' => array(
 					1 => __( 'Normal', 'wp-commentnavi' ),
-					2 => __( 'Drop-down List', 'wp-commentnavi' ),
+					2 => __( 'Drop Down List', 'wp-commentnavi' ),
 				),
 			),
 			'always_show'                  => array(
-				'title'   => __( 'Always Show Comment Navigation', 'wp-commentnavi' ),
+				'title'   => __( 'Always Show Comment Navigation?', 'wp-commentnavi' ),
 				'type'    => 'radio',
 				'choices' => $yes_no,
 				'notes'   => array( __( 'Show navigation even if there\'s only one page of comments.', 'wp-commentnavi' ) ),
 			),
 			'num_pages'                    => array(
-				'title' => __( 'Number Of Pages To Show', 'wp-commentnavi' ),
+				'title' => __( 'Number Of Pages To Show?', 'wp-commentnavi' ),
 				'type'  => 'number',
 				'class' => 'small-text',
 			),

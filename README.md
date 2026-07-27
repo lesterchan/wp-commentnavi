@@ -96,6 +96,8 @@ These [filters](https://developer.wordpress.org/plugins/hooks/filters/) change t
 * FIXED: A post with no comments reported "Page 1 of 0" when *Always Show Comment Navigation* was on
 * FIXED: The drop-down style pointed its form at an admin URL, and `case 2;` used a semicolon, which PHP 8.5 deprecates
 * FIXED: The stylesheet is enqueued on `wp_enqueue_scripts` rather than `wp_print_styles`, and its version tracks the plugin version instead of being pinned to 1.10
+* FIXED: `commentnavi-css.css` no longer carries a dead `.wp-commentnavi-all-comments-link` rule for the removed feature. No style declaration changed
+* NOTE: Four settings labels were renamed from "Text For First/Last/Next/Previous Comment" to "... Page", because those links go to a page of comments rather than to a comment. Renaming a string resets it on translate.wordpress.org, so those four labels will show in English in translated locales until someone retranslates them. Every other existing label kept its original wording precisely to avoid that
 
 ### 1.12.2
 * FIXED: XSS. esc_attr() on form values
