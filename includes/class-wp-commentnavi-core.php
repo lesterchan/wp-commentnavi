@@ -253,8 +253,8 @@ class WP_CommentNavi_Core {
 			return $out;
 		}
 
-		// $out is assembled from escaped fragments above.
-		echo $out; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- assembled above from esc_url()/esc_attr()/tag_escape() fragments and kses'd option text; there is no escaping function for markup that is already escaped, and running wp_kses() over the finished string would strip aria-current, a custom wrapper_tag and whatever a wp_commentnavi filter added.
+		echo $out;
 	}
 
 	/**
