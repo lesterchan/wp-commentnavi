@@ -214,9 +214,17 @@ class WP_CommentNavi_Settings_Test extends WP_CommentNavi_TestCase {
 		$fields   = WP_CommentNavi_Settings::fields();
 		$sections = array( WP_CommentNavi_Settings::SECTION_TEXT, WP_CommentNavi_Settings::SECTION_DISPLAY );
 
+		// Compared as sets, not in order: fields() is in the order the screen has
+		// always shown the settings in, which is a deliberate choice, and
+		// get_defaults() has no order worth coupling it to.
+		$expected = array_keys( WP_CommentNavi_Options::get_defaults() );
+		$actual   = array_keys( $fields );
+		sort( $expected );
+		sort( $actual );
+
 		$this->assertSame(
-			array_keys( WP_CommentNavi_Options::get_defaults() ),
-			array_keys( $fields ),
+			$expected,
+			$actual,
 			'the settings screen and the option defaults disagree about which settings exist.'
 		);
 
