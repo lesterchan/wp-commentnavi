@@ -23,28 +23,19 @@ class Test_CommentNavi_Admin extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Render one settings field and return its markup.
+	 * Render one registered settings field and return its markup.
 	 *
-	 * @param string $method Renderer method name.
-	 * @param string $name   Option key.
-	 * @param array  $extra  Extra field arguments.
+	 * The callback is looked up the same way register_settings() registers it,
+	 * so a field renamed in one place and not the other fails here.
+	 *
+	 * @param string $name Option key.
 	 * @return string
 	 */
-	protected function render_field( $method, $name, array $extra = array() ) {
-		$args = array_merge(
-			array(
-				'label_for' => 'commentnavi-' . $name,
-				'name'      => $name,
-				'class_'    => '',
-				'tokens'    => array(),
-				'choices'   => array(),
-				'notes'     => array(),
-			),
-			$extra
-		);
+	protected function render_field( $name ) {
+		$method = 'field_' . $name;
 
 		ob_start();
-		WP_CommentNavi_Settings::$method( $args );
+		WP_CommentNavi_Settings::$method();
 		return ob_get_clean();
 	}
 
@@ -69,8 +60,8 @@ class Test_CommentNavi_Admin extends WP_UnitTestCase {
 			)
 		);
 
-		$left  = $this->render_field( 'render_text_field', 'dotleft_text' );
-		$right = $this->render_field( 'render_text_field', 'dotright_text' );
+		$left  = $this->render_field( 'dotleft_text' );
+		$right = $this->render_field( 'dotright_text' );
 
 		$this->assertStringContainsString( 'value="LEFTDOTS"', $left );
 		$this->assertStringNotContainsString( 'RIGHTDOTS', $left );
@@ -206,28 +197,10 @@ class Test_CommentNavi_Admin extends WP_UnitTestCase {
 			)
 		);
 
-		$style = $this->render_field(
-			'render_select_field',
-			'style',
-			array(
-				'choices' => array(
-					1 => 'Normal',
-					2 => 'Drop-down List',
-				),
-			)
-		);
+		$style = $this->render_field( 'style' );
 		$this->assertMatchesRegularExpression( '/value="2"\s+selected/', $style );
 
-		$always = $this->render_field(
-			'render_radio_field',
-			'always_show',
-			array(
-				'choices' => array(
-					1 => 'Yes',
-					0 => 'No',
-				),
-			)
-		);
+		$always = $this->render_field( 'always_show' );
 		$this->assertMatchesRegularExpression( '/value="1"\s+checked/', $always );
 	}
 
@@ -244,7 +217,7 @@ class Test_CommentNavi_Admin extends WP_UnitTestCase {
 			)
 		);
 
-		$html = $this->render_field( 'render_text_field', 'first_text' );
+		$html = $this->render_field( 'first_text' );
 
 		$doc = new DOMDocument();
 		$use = libxml_use_internal_errors( true );
@@ -311,5 +284,90 @@ class Test_CommentNavi_Admin extends WP_UnitTestCase {
 
 		$this->assertCount( 2, $links );
 		$this->assertStringContainsString( 'options-general.php?page=' . WP_COMMENTNAVI_SLUG, $links[0] );
+	}
+
+	/**
+	 * Every field the screen registers has a callback to render it and a section
+	 * to render it in, and every setting the plugin stores has a field.
+	 *
+	 * @return void
+	 */
+	public function test_every_setting_has_a_registered_field() {
+		$fields   = WP_CommentNavi_Settings::fields();
+		$sections = array( WP_CommentNavi_Settings::SECTION_TEXT, WP_CommentNavi_Settings::SECTION_DISPLAY );
+
+		$this->assertSame(
+			array_keys( WP_CommentNavi_Options::get_defaults() ),
+			array_keys( $fields ),
+			'the settings screen and the option defaults disagree about which settings exist.'
+		);
+
+		foreach ( $fields as $name => $field ) {
+			$this->assertTrue(
+				method_exists( 'WP_CommentNavi_Settings', 'field_' . $name ),
+				$name . ' is registered but has no field_' . $name . '() callback.'
+			);
+			$this->assertContains( $field['section'], $sections, $name . ' is in a section that is never registered.' );
+			$this->assertNotEmpty( $field['title'], $name . ' has no title.' );
+		}
+	}
+
+	/**
+	 * The section ids are prefixed with the plugin, and the display section is
+	 * not spelled the same as the settings row.
+	 *
+	 * @return void
+	 */
+	public function test_section_constants_are_prefixed() {
+		$this->assertSame( 'wp_commentnavi_text', WP_CommentNavi_Settings::SECTION_TEXT );
+		$this->assertSame( 'wp_commentnavi_display', WP_CommentNavi_Settings::SECTION_DISPLAY );
+		$this->assertNotSame( WP_CommentNavi_Options::OPTION, WP_CommentNavi_Settings::SECTION_DISPLAY );
+	}
+
+	/**
+	 * Every field posts into the settings array and carries the id its label
+	 * points at.
+	 *
+	 * @return void
+	 */
+	public function test_fields_post_into_the_settings_array() {
+		foreach ( array_keys( WP_CommentNavi_Settings::fields() ) as $name ) {
+			$html = $this->render_field( $name );
+
+			$this->assertStringContainsString(
+				'name="' . WP_CommentNavi_Options::OPTION . '[' . $name . ']"',
+				$html,
+				$name . ' does not post into the ' . WP_CommentNavi_Options::OPTION . ' array.'
+			);
+			$this->assertStringContainsString(
+				'id="' . WP_CommentNavi_Settings::PAGE . '-' . $name . '"',
+				$html,
+				$name . ' does not carry the id its label_for points at.'
+			);
+		}
+	}
+
+	/**
+	 * The form table comes from do_settings_sections(), so the plugin must not
+	 * write one itself.
+	 *
+	 * §4.2 allows zero hand-written <table class="form-table">, and §4.4 forbids
+	 * inline style, width, valign and align attributes anywhere in the markup.
+	 *
+	 * @return void
+	 */
+	public function test_the_screen_hand_writes_no_table_and_no_inline_attributes() {
+		$source = file_get_contents( dirname( __DIR__ ) . '/includes/class-wp-commentnavi-settings.php' );
+
+		$this->assertStringNotContainsString( 'form-table', $source, 'do_settings_sections() emits the form table.' );
+		$this->assertStringNotContainsString( '<table', $source, 'the settings screen hand-writes a table.' );
+
+		foreach ( array( 'style=', 'width=', 'valign=', 'align=' ) as $attribute ) {
+			$this->assertStringNotContainsString(
+				$attribute,
+				$source,
+				'the settings screen uses an inline ' . rtrim( $attribute, '=' ) . ' attribute.'
+			);
+		}
 	}
 }
