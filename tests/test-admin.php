@@ -269,6 +269,39 @@ class Test_CommentNavi_Admin extends WP_UnitTestCase {
 	}
 
 	/**
+	 * The settings screen asks for manage_options unless a filter says otherwise.
+	 *
+	 * @return void
+	 */
+	public function test_capability_defaults_to_manage_options() {
+		$this->assertSame( 'manage_options', WP_CommentNavi_Settings::CAPABILITY );
+		$this->assertSame( 'manage_options', WP_CommentNavi_Settings::capability() );
+	}
+
+	/**
+	 * Every capability check goes through one filter, which is handed the context
+	 * it is being asked about.
+	 *
+	 * @return void
+	 */
+	public function test_capability_filter_is_honoured() {
+		$seen = null;
+
+		$replace = static function ( $capability, $context ) use ( &$seen ) {
+			$seen = $context;
+			return 'edit_pages';
+		};
+		add_filter( 'wp_commentnavi_capability', $replace, 10, 2 );
+
+		$capability = WP_CommentNavi_Settings::capability();
+
+		remove_filter( 'wp_commentnavi_capability', $replace, 10 );
+
+		$this->assertSame( 'edit_pages', $capability );
+		$this->assertSame( 'settings', $seen, 'the filter was not told which context it was being asked about.' );
+	}
+
+	/**
 	 * A Settings link is added to the plugin's row on the Plugins screen.
 	 *
 	 * @return void

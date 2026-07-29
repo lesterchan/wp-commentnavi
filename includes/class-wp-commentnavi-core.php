@@ -125,17 +125,101 @@ class WP_CommentNavi_Core {
 			$start_page = 1;
 		}
 
-		// Support for filters to change class names.
+		/*
+		 * One filter per element, so a theme can rename a single class without
+		 * having to reproduce the other nine. The names mirror WP-PageNavi's
+		 * wp_pagenavi_class_* family element for element, so a theme that styles
+		 * both plugins reads the same way twice.
+		 */
 		$class_names = array(
+			/**
+			 * Filters the class on the "Page x of y" label.
+			 *
+			 * @since 2.0.0
+			 *
+			 * @param string $class_name Class name. Default 'pages'.
+			 */
 			'pages'                => apply_filters( 'wp_commentnavi_class_pages', 'pages' ),
+
+			/**
+			 * Filters the class on the link to the first page of comments.
+			 *
+			 * @since 2.0.0
+			 *
+			 * @param string $class_name Class name. Default 'first'.
+			 */
 			'first'                => apply_filters( 'wp_commentnavi_class_first', 'first' ),
+
+			/**
+			 * Filters the class on the link to the previous page of comments.
+			 *
+			 * @since 2.0.0
+			 *
+			 * @param string $class_name Class name. Default 'previouscommentslink'.
+			 */
 			'previouscommentslink' => apply_filters( 'wp_commentnavi_class_previouscommentslink', 'previouscommentslink' ),
+
+			/**
+			 * Filters the class on the ellipsis that stands in for a skipped run of pages.
+			 *
+			 * @since 2.0.0
+			 *
+			 * @param string $class_name Class name. Default 'extend'.
+			 */
 			'extend'               => apply_filters( 'wp_commentnavi_class_extend', 'extend' ),
+
+			/**
+			 * Filters the class added to page numbers below the current page.
+			 *
+			 * @since 2.0.0
+			 *
+			 * @param string $class_name Class name. Default 'smaller'.
+			 */
 			'smaller'              => apply_filters( 'wp_commentnavi_class_smaller', 'smaller' ),
+
+			/**
+			 * Filters the class shared by every numbered page link.
+			 *
+			 * @since 2.0.0
+			 *
+			 * @param string $class_name Class name. Default 'page'.
+			 */
 			'page'                 => apply_filters( 'wp_commentnavi_class_page', 'page' ),
+
+			/**
+			 * Filters the class on the page the visitor is reading.
+			 *
+			 * @since 2.0.0
+			 *
+			 * @param string $class_name Class name. Default 'current'.
+			 */
 			'current'              => apply_filters( 'wp_commentnavi_class_current', 'current' ),
+
+			/**
+			 * Filters the class added to page numbers above the current page.
+			 *
+			 * @since 2.0.0
+			 *
+			 * @param string $class_name Class name. Default 'larger'.
+			 */
 			'larger'               => apply_filters( 'wp_commentnavi_class_larger', 'larger' ),
+
+			/**
+			 * Filters the class on the link to the next page of comments.
+			 *
+			 * @since 2.0.0
+			 *
+			 * @param string $class_name Class name. Default 'nextcommentslink'.
+			 */
 			'nextcommentslink'     => apply_filters( 'wp_commentnavi_class_nextcommentslink', 'nextcommentslink' ),
+
+			/**
+			 * Filters the class on the link to the last page of comments.
+			 *
+			 * @since 2.0.0
+			 *
+			 * @param string $class_name Class name. Default 'last'.
+			 */
 			'last'                 => apply_filters( 'wp_commentnavi_class_last', 'last' ),
 		);
 

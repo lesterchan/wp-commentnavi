@@ -63,6 +63,28 @@ class WP_CommentNavi_Settings {
 	}
 
 	/**
+	 * The capability required for a given context.
+	 *
+	 * Every capability check in the plugin goes through here, so a site that
+	 * hands the settings to an editor changes one filter rather than hunting for
+	 * current_user_can() calls.
+	 *
+	 * @param string $context What the capability is being checked for.
+	 * @return string
+	 */
+	public static function capability( $context = 'settings' ) {
+		/**
+		 * Filters the capability required to manage the plugin.
+		 *
+		 * @since 2.0.0
+		 *
+		 * @param string $capability The required capability.
+		 * @param string $context    What the capability is being checked for.
+		 */
+		return (string) apply_filters( 'wp_commentnavi_capability', self::CAPABILITY, $context );
+	}
+
+	/**
 	 * Add the settings page under the Settings menu.
 	 *
 	 * @return void
@@ -71,7 +93,7 @@ class WP_CommentNavi_Settings {
 		add_options_page(
 			__( 'CommentNavi Settings', 'wp-commentnavi' ),
 			__( 'CommentNavi', 'wp-commentnavi' ),
-			'manage_options',
+			self::capability(),
 			self::PAGE,
 			array( __CLASS__, 'render_page' )
 		);
@@ -408,7 +430,7 @@ class WP_CommentNavi_Settings {
 	 * @return void
 	 */
 	public static function render_page() {
-		if ( ! current_user_can( 'manage_options' ) ) {
+		if ( ! current_user_can( self::capability() ) ) {
 			wp_die( esc_html__( 'You do not have sufficient permissions to access this page.', 'wp-commentnavi' ) );
 		}
 		?>
