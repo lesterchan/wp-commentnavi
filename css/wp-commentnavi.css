@@ -1,63 +1,47 @@
 /*
-Default style for the WP-CommentNavi plugin.
+ * Front-end styles for WP-CommentNavi.
+ *
+ * Everything is scoped under the .wp-commentnavi root class, and font-family,
+ * font-size and color are deliberately never set: the navigation inherits them
+ * from the theme, which is why it looks at home in one without being told
+ * anything about it.
+ *
+ * One sheet serves both text directions. Every property below is either
+ * direction-neutral or a logical one -- no margin-left, no text-align: left, no
+ * float -- so there is no -rtl.css to keep in step with this file.
+ *
+ * Both colours come from a custom property with a sensible fallback, so a theme
+ * can restyle the navigation by setting two variables anywhere up the tree
+ * rather than by copying this file. The resting border has a dark-scheme
+ * default of its own; the current and hovered border is currentColor, which
+ * follows the theme's text colour into either scheme on its own.
+ */
 
-Copy this file into your theme's directory to override it; your copy survives
-plugin updates, and a copy in a child theme wins over one in the parent. Or set
-"Use wp-commentnavi.css" to No under Settings -> CommentNavi and put the styles
-in your theme's own stylesheet.
+.wp-commentnavi {
+	clear: both;
+}
 
-https://lesterchan.net/portfolio/programming/php/
-*/
-
-
-.wp-commentnavi a, .wp-commentnavi a:link {
-	padding: 2px 4px 2px 4px; 
+.wp-commentnavi a,
+.wp-commentnavi span {
+	border: 1px solid var(--wp-commentnavi-border-color, #bfbfbf);
 	margin: 2px;
+	padding: 2px 4px;
 	text-decoration: none;
-	border: 1px solid #0066cc;
-	color: #0066cc;
-	background-color: #FFFFFF;	
 }
-.wp-commentnavi a:visited {
-	padding: 2px 4px 2px 4px; 
-	margin: 2px;
-	text-decoration: none;
-	border: 1px solid #0066cc;
-	color: #0066cc;
-	background-color: #FFFFFF;	
+
+@media (prefers-color-scheme: dark) {
+
+	.wp-commentnavi a,
+	.wp-commentnavi span {
+		border-color: var(--wp-commentnavi-border-color, #4f4f4f);
+	}
 }
-.wp-commentnavi a:hover {	
-	border: 1px solid #000000;
-	color: #000000;
-	background-color: #FFFFFF;
-}
-.wp-commentnavi a:active {
-	padding: 2px 4px 2px 4px; 
-	margin: 2px;
-	text-decoration: none;
-	border: 1px solid #0066cc;
-	color: #0066cc;
-	background-color: #FFFFFF;	
-}
-.wp-commentnavi span.pages {
-	padding: 2px 4px 2px 4px; 
-	margin: 2px 2px 2px 2px;
-	color: #000000;
-	border: 1px solid #000000;
-	background-color: #FFFFFF;
-}
+
+.wp-commentnavi a:hover,
 .wp-commentnavi span.current {
-	padding: 2px 4px 2px 4px; 
-	margin: 2px;
-	font-weight: bold;
-	border: 1px solid #000000;
-	color: #000000;
-	background-color: #FFFFFF;
+	border-color: var(--wp-commentnavi-border-color-current, currentColor);
 }
-.wp-commentnavi span.extend {
-	padding: 2px 4px 2px 4px; 
-	margin: 2px;	
-	border: 1px solid #000000;
-	color: #000000;
-	background-color: #FFFFFF;
+
+.wp-commentnavi span.current {
+	font-weight: bold;
 }
