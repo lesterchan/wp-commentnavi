@@ -34,7 +34,7 @@ tests_add_filter( 'muplugins_loaded', '_commentnavi_manually_load_plugin' );
 
 require $_tests_dir . '/includes/bootstrap.php';
 
-// Extends WP_UnitTestCase, so it can only be loaded once the suite has booted.
-// phpunit.xml.dist only collects files named test-*.php, so this is not picked
-// up as a test case itself.
-require_once __DIR__ . '/class-commentnavi-testcase.php';
+// After the WordPress bootstrap, so WP_UnitTestCase exists to extend. Discovery
+// is by the test- filename prefix, so a helper- file is never collected as a
+// test case itself.
+require_once __DIR__ . '/helper-testcase.php';

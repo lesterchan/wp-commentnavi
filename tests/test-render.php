@@ -18,13 +18,8 @@
 /**
  * Covers wp_commentnavi().
  */
-class Test_CommentNavi_Render extends CommentNavi_TestCase {
+class WP_CommentNavi_Render_Test extends WP_CommentNavi_TestCase {
 
-	/**
-	 * On the first page of ten, the window is pages one to five.
-	 *
-	 * @return void
-	 */
 	public function test_window_on_first_page() {
 		$this->set_options();
 
@@ -38,11 +33,6 @@ class Test_CommentNavi_Render extends CommentNavi_TestCase {
 		$this->assertSame( array( 1, 2, 3, 4, 5 ), $this->page_numbers( $html ) );
 	}
 
-	/**
-	 * In the middle of the run the window is centred on the current page.
-	 *
-	 * @return void
-	 */
 	public function test_window_slides_with_the_current_page() {
 		$this->set_options();
 
@@ -56,13 +46,10 @@ class Test_CommentNavi_Render extends CommentNavi_TestCase {
 		$this->assertSame( array( 3, 4, 5, 6, 7 ), $this->page_numbers( $html ) );
 	}
 
-	/**
-	 * At the end of the run the window stops rather than running past the last
-	 * page.
-	 *
-	 * @return void
-	 */
 	public function test_window_clamps_at_the_last_page() {
+		// At the end of the run the window stops rather than running past the last
+		// page.
+
 		$this->set_options();
 
 		$html = $this->render(
@@ -75,11 +62,6 @@ class Test_CommentNavi_Render extends CommentNavi_TestCase {
 		$this->assertSame( array( 6, 7, 8, 9, 10 ), $this->page_numbers( $html ) );
 	}
 
-	/**
-	 * A window wider than the number of pages shows every page and no more.
-	 *
-	 * @return void
-	 */
 	public function test_window_wider_than_the_run() {
 		$this->set_options( array( 'num_pages' => 20 ) );
 
@@ -93,11 +75,6 @@ class Test_CommentNavi_Render extends CommentNavi_TestCase {
 		$this->assertSame( array( 1, 2, 3 ), $this->page_numbers( $html ) );
 	}
 
-	/**
-	 * The number of pages shown honours the num_pages setting.
-	 *
-	 * @return void
-	 */
 	public function test_num_pages_setting_is_respected() {
 		$this->set_options( array( 'num_pages' => 3 ) );
 
@@ -111,13 +88,10 @@ class Test_CommentNavi_Render extends CommentNavi_TestCase {
 		$this->assertSame( array( 4, 5, 6 ), $this->page_numbers( $html ) );
 	}
 
-	/**
-	 * Exactly one element is marked as the current page, and it is the one the
-	 * request asked for.
-	 *
-	 * @return void
-	 */
 	public function test_current_page_is_marked_once() {
+		// Exactly one element is marked as the current page, and it is the one the
+		// request asked for.
+
 		$this->set_options();
 
 		$html = $this->render(
@@ -130,11 +104,6 @@ class Test_CommentNavi_Render extends CommentNavi_TestCase {
 		$this->assertSame( array( '4' ), $this->current_labels( $html ) );
 	}
 
-	/**
-	 * Every numbered link points at the matching comment page.
-	 *
-	 * @return void
-	 */
 	public function test_numbered_links_point_at_their_comment_page() {
 		$this->set_options();
 
@@ -163,11 +132,6 @@ class Test_CommentNavi_Render extends CommentNavi_TestCase {
 		$this->assertSame( 4, $found );
 	}
 
-	/**
-	 * %CURRENT_PAGE% and %TOTAL_PAGES% are substituted in the pages text.
-	 *
-	 * @return void
-	 */
 	public function test_pages_text_tokens_are_substituted() {
 		$this->set_options();
 
@@ -183,11 +147,6 @@ class Test_CommentNavi_Render extends CommentNavi_TestCase {
 		$this->assertStringNotContainsString( '%TOTAL_PAGES%', $html );
 	}
 
-	/**
-	 * %PAGE_NUMBER% is substituted in both the page and current-page text.
-	 *
-	 * @return void
-	 */
 	public function test_page_number_token_is_substituted() {
 		$this->set_options(
 			array(
@@ -210,11 +169,6 @@ class Test_CommentNavi_Render extends CommentNavi_TestCase {
 		$this->assertStringNotContainsString( '%PAGE_NUMBER%', $html );
 	}
 
-	/**
-	 * %TOTAL_PAGES% is substituted in the first and last link text.
-	 *
-	 * @return void
-	 */
 	public function test_total_pages_token_in_first_and_last_text() {
 		$this->set_options(
 			array(
@@ -235,11 +189,6 @@ class Test_CommentNavi_Render extends CommentNavi_TestCase {
 		$this->assertStringContainsString( 'Last of 20', $text );
 	}
 
-	/**
-	 * With a single page there is nothing to navigate, so nothing is printed.
-	 *
-	 * @return void
-	 */
 	public function test_single_page_prints_nothing() {
 		$this->set_options();
 
@@ -256,11 +205,6 @@ class Test_CommentNavi_Render extends CommentNavi_TestCase {
 		);
 	}
 
-	/**
-	 * A post with no comments at all prints nothing.
-	 *
-	 * @return void
-	 */
 	public function test_no_comment_pages_prints_nothing() {
 		$this->set_options();
 
@@ -278,11 +222,6 @@ class Test_CommentNavi_Render extends CommentNavi_TestCase {
 		);
 	}
 
-	/**
-	 * The always_show option overrides the single-page suppression.
-	 *
-	 * @return void
-	 */
 	public function test_always_show_prints_on_a_single_page() {
 		$this->set_options( array( 'always_show' => 1 ) );
 
@@ -297,11 +236,6 @@ class Test_CommentNavi_Render extends CommentNavi_TestCase {
 		$this->assertStringContainsString( 'Page 1 of 1', wp_strip_all_tags( $html ) );
 	}
 
-	/**
-	 * The wrapper keeps the class themes have always styled against.
-	 *
-	 * @return void
-	 */
 	public function test_wrapper_class_is_unchanged() {
 		$this->set_options();
 
@@ -310,11 +244,6 @@ class Test_CommentNavi_Render extends CommentNavi_TestCase {
 		$this->assertMatchesRegularExpression( '/class=[\'"]wp-commentnavi[\'"]/', $html );
 	}
 
-	/**
-	 * The before and after arguments are printed outside the wrapper.
-	 *
-	 * @return void
-	 */
 	public function test_before_and_after_wrap_the_output() {
 		$this->set_options();
 
@@ -330,11 +259,6 @@ class Test_CommentNavi_Render extends CommentNavi_TestCase {
 		$this->assertStringEndsWith( '</p>', trim( $html ) );
 	}
 
-	/**
-	 * An empty text option hides that part of the navigation.
-	 *
-	 * @return void
-	 */
 	public function test_empty_pages_text_hides_the_pages_label() {
 		$this->set_options( array( 'pages_text' => '' ) );
 
@@ -344,13 +268,10 @@ class Test_CommentNavi_Render extends CommentNavi_TestCase {
 		$this->assertSame( array( 1, 2, 3, 4, 5 ), $this->page_numbers( $html ) );
 	}
 
-	/**
-	 * The ellipsis appears on the side that has hidden pages, and not on the side
-	 * that does not.
-	 *
-	 * @return void
-	 */
 	public function test_ellipsis_sides() {
+		// The ellipsis appears on the side that has hidden pages, and not on the side
+		// that does not.
+
 		$this->set_options(
 			array(
 				'dotleft_text'  => 'LEFTDOTS',
@@ -377,13 +298,10 @@ class Test_CommentNavi_Render extends CommentNavi_TestCase {
 		$this->assertStringNotContainsString( 'RIGHTDOTS', $last );
 	}
 
-	/**
-	 * The drop-down style renders a select with one option per page and the
-	 * current page selected.
-	 *
-	 * @return void
-	 */
 	public function test_dropdown_style() {
+		// The drop-down style renders a select with one option per page and the
+		// current page selected.
+
 		$this->set_options( array( 'style' => 2 ) );
 
 		$html = $this->render(
@@ -410,11 +328,6 @@ class Test_CommentNavi_Render extends CommentNavi_TestCase {
 		$this->assertSame( array( '3' ), $this->current_labels( $html ) );
 	}
 
-	/**
-	 * The deprecated drop-down template tag still renders something.
-	 *
-	 * @return void
-	 */
 	public function test_deprecated_dropdown_tag_still_works() {
 		$this->set_options();
 		$this->go_to( get_permalink( $this->post_id ) );

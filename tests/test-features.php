@@ -9,13 +9,8 @@
  * Covers larger page numbers, the class-name filters, the stylesheet toggle and
  * the array argument form of the template tag.
  */
-class Test_CommentNavi_Features extends CommentNavi_TestCase {
+class WP_CommentNavi_Features_Test extends WP_CommentNavi_TestCase {
 
-	/**
-	 * Larger page numbers are appended after the window when enabled.
-	 *
-	 * @return void
-	 */
 	public function test_larger_page_numbers_after_the_window() {
 		$this->set_options(
 			array(
@@ -34,11 +29,6 @@ class Test_CommentNavi_Features extends CommentNavi_TestCase {
 		$this->assertSame( array( 1, 2, 3, 4, 5, 10, 20, 30 ), $this->page_numbers( $html ) );
 	}
 
-	/**
-	 * And prepended before it at the far end of a long run.
-	 *
-	 * @return void
-	 */
 	public function test_smaller_page_numbers_before_the_window() {
 		$this->set_options(
 			array(
@@ -57,13 +47,10 @@ class Test_CommentNavi_Features extends CommentNavi_TestCase {
 		$this->assertSame( array( 10, 20, 30, 96, 97, 98, 99, 100 ), $this->page_numbers( $html ) );
 	}
 
-	/**
-	 * With the default of 0, no larger page numbers appear at all -- which is
-	 * what keeps an upgraded site's navigation looking the way it did.
-	 *
-	 * @return void
-	 */
 	public function test_larger_page_numbers_absent_by_default() {
+		// With the default of 0, no larger page numbers appear at all -- which is
+		// what keeps an upgraded site's navigation looking the way it did.
+
 		$this->set_options( array( 'num_larger_page_numbers' => 0 ) );
 
 		$html = $this->render(
@@ -76,11 +63,6 @@ class Test_CommentNavi_Features extends CommentNavi_TestCase {
 		$this->assertSame( array( 1, 2, 3, 4, 5 ), $this->page_numbers( $html ) );
 	}
 
-	/**
-	 * The multiple setting controls the step between larger page numbers.
-	 *
-	 * @return void
-	 */
 	public function test_larger_page_numbers_multiple() {
 		$this->set_options(
 			array(
@@ -99,11 +81,6 @@ class Test_CommentNavi_Features extends CommentNavi_TestCase {
 		$this->assertSame( array( 1, 2, 3, 4, 5, 25, 50 ), $this->page_numbers( $html ) );
 	}
 
-	/**
-	 * Each class name can be replaced through its filter.
-	 *
-	 * @return void
-	 */
 	public function test_class_name_filters() {
 		$this->set_options();
 
@@ -124,11 +101,6 @@ class Test_CommentNavi_Features extends CommentNavi_TestCase {
 		$this->assertStringContainsString( 'cn-custom-current', $html );
 	}
 
-	/**
-	 * The whole markup can be rewritten through the wp_commentnavi filter.
-	 *
-	 * @return void
-	 */
 	public function test_output_filter() {
 		$this->set_options();
 
@@ -144,11 +116,6 @@ class Test_CommentNavi_Features extends CommentNavi_TestCase {
 		$this->assertSame( 'REPLACED', trim( $html ) );
 	}
 
-	/**
-	 * The stylesheet is enqueued by default and skipped when turned off.
-	 *
-	 * @return void
-	 */
 	public function test_stylesheet_toggle() {
 		$this->set_options( array( 'use_commentnavi_css' => 1 ) );
 		WP_CommentNavi_Core::stylesheets();
@@ -162,13 +129,10 @@ class Test_CommentNavi_Features extends CommentNavi_TestCase {
 		$this->assertFalse( wp_style_is( 'wp-commentnavi', 'enqueued' ) );
 	}
 
-	/**
-	 * The stylesheet URL is built from the main plugin file, not a hardcoded
-	 * directory name, so the plugin works under any directory name.
-	 *
-	 * @return void
-	 */
 	public function test_stylesheet_url_is_not_hardcoded() {
+		// The stylesheet URL is built from the main plugin file, not a hardcoded
+		// directory name, so the plugin works under any directory name.
+
 		$this->set_options( array( 'use_commentnavi_css' => 1 ) );
 		WP_CommentNavi_Core::stylesheets();
 
@@ -179,13 +143,10 @@ class Test_CommentNavi_Features extends CommentNavi_TestCase {
 		$this->assertSame( WP_COMMENTNAVI_URL . 'css/wp-commentnavi.css', $src );
 	}
 
-	/**
-	 * The template tag accepts an array of arguments as well as the positional
-	 * form every previous release used.
-	 *
-	 * @return void
-	 */
 	public function test_array_argument_form() {
+		// The template tag accepts an array of arguments as well as the positional
+		// form every previous release used.
+
 		$this->set_options();
 
 		$this->go_to( get_permalink( $this->post_id ) );
@@ -209,11 +170,6 @@ class Test_CommentNavi_Features extends CommentNavi_TestCase {
 		$this->assertStringStartsWith( '<nav', trim( $markup ) );
 	}
 
-	/**
-	 * Per-call option overrides do not touch what is stored.
-	 *
-	 * @return void
-	 */
 	public function test_per_call_option_override() {
 		$this->set_options( array( 'num_pages' => 5 ) );
 
@@ -236,18 +192,13 @@ class Test_CommentNavi_Features extends CommentNavi_TestCase {
 		$this->assertSame( 5, WP_CommentNavi_Options::get( 'num_pages' ) );
 	}
 
-	/**
-	 * The "View all comments" feature is gone, along with its query variable.
-	 *
-	 * It hooked pre_get_posts with no is_main_query() or is_singular() guard and
-	 * forced comments_per_page to 9999, so any visitor could trigger an unbounded
-	 * comment query on any URL by appending ?comment-all=1. Removing the template
-	 * tag is a breaking change for themes that call it, which is why it is pinned
-	 * here rather than left to be quietly reintroduced.
-	 *
-	 * @return void
-	 */
 	public function test_view_all_comments_feature_is_removed() {
+		// It hooked pre_get_posts with no is_main_query() or is_singular() guard and
+		// forced comments_per_page to 9999, so any visitor could trigger an unbounded
+		// comment query on any URL by appending ?comment-all=1. Removing the template
+		// tag is a breaking change for themes that call it, which is why it is pinned
+		// here rather than left to be quietly reintroduced.
+
 		$this->assertFalse( function_exists( 'wp_commentnavi_all_comments_link' ) );
 
 		$this->go_to( add_query_arg( 'comment-all', 1, get_permalink( $this->post_id ) ) );
@@ -255,11 +206,6 @@ class Test_CommentNavi_Features extends CommentNavi_TestCase {
 		$this->assertNotContains( 'comment-all', $GLOBALS['wp']->public_query_vars );
 	}
 
-	/**
-	 * The wrapper tag is escaped rather than interpolated raw.
-	 *
-	 * @return void
-	 */
 	public function test_wrapper_tag_is_escaped() {
 		$this->set_options();
 

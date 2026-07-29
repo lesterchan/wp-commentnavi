@@ -17,7 +17,7 @@
 /**
  * Covers wp_commentnavi() over a real paginated comment thread.
  */
-class Test_CommentNavi_Integration extends CommentNavi_TestCase {
+class WP_CommentNavi_Integration_Test extends WP_CommentNavi_TestCase {
 
 	/**
 	 * Create a post carrying a given number of approved comments.
@@ -87,7 +87,7 @@ class Test_CommentNavi_Integration extends CommentNavi_TestCase {
 		 * tests call comments_template() at all.
 		 */
 		$fixture = static function () {
-			return __DIR__ . '/fixture-comments-template.php';
+			return __DIR__ . '/helper-comments-template.php';
 		};
 		add_filter( 'comments_template', $fixture );
 
@@ -106,13 +106,10 @@ class Test_CommentNavi_Integration extends CommentNavi_TestCase {
 		return $out;
 	}
 
-	/**
-	 * Core really does report three pages for 25 comments at 10 per page, and the
-	 * plugin renders a link for each.
-	 *
-	 * @return void
-	 */
 	public function test_real_thread_paginates() {
+		// Core really does report three pages for 25 comments at 10 per page, and the
+		// plugin renders a link for each.
+
 		update_option( 'page_comments', 1 );
 		update_option( 'comments_per_page', 10 );
 		$this->set_options();
@@ -127,11 +124,6 @@ class Test_CommentNavi_Integration extends CommentNavi_TestCase {
 		$this->assertSame( array( '1' ), $this->current_labels( $html ) );
 	}
 
-	/**
-	 * Asking for the second page marks the second page current.
-	 *
-	 * @return void
-	 */
 	public function test_second_page_of_a_real_thread() {
 		update_option( 'page_comments', 1 );
 		update_option( 'comments_per_page', 10 );
@@ -145,13 +137,10 @@ class Test_CommentNavi_Integration extends CommentNavi_TestCase {
 		$this->assertStringContainsString( 'Page 2 of 3', wp_strip_all_tags( $html ) );
 	}
 
-	/**
-	 * The links core builds for a real thread actually point at comment pages of
-	 * that post.
-	 *
-	 * @return void
-	 */
 	public function test_real_links_point_at_this_post() {
+		// The links core builds for a real thread actually point at comment pages of
+		// that post.
+
 		update_option( 'page_comments', 1 );
 		update_option( 'comments_per_page', 10 );
 		$this->set_options();
@@ -173,11 +162,6 @@ class Test_CommentNavi_Integration extends CommentNavi_TestCase {
 		$this->assertGreaterThan( 0, $found, 'No numbered links were rendered.' );
 	}
 
-	/**
-	 * A thread short enough to fit on one page renders no navigation.
-	 *
-	 * @return void
-	 */
 	public function test_short_real_thread_renders_nothing() {
 		update_option( 'page_comments', 1 );
 		update_option( 'comments_per_page', 10 );
@@ -189,13 +173,10 @@ class Test_CommentNavi_Integration extends CommentNavi_TestCase {
 		$this->assertSame( '', trim( $html ) );
 	}
 
-	/**
-	 * With comment paging turned off in Settings -> Discussion there is only ever
-	 * one page, so nothing renders however many comments there are.
-	 *
-	 * @return void
-	 */
 	public function test_paging_disabled_renders_nothing() {
+		// With comment paging turned off in Settings -> Discussion there is only ever
+		// one page, so nothing renders however many comments there are.
+
 		update_option( 'page_comments', 0 );
 		$this->set_options();
 
@@ -205,11 +186,6 @@ class Test_CommentNavi_Integration extends CommentNavi_TestCase {
 		$this->assertSame( '', trim( $html ) );
 	}
 
-	/**
-	 * The stylesheet is enqueued during a real front end request.
-	 *
-	 * @return void
-	 */
 	public function test_stylesheet_enqueued_on_a_real_request() {
 		$this->set_options( array( 'use_commentnavi_css' => 1 ) );
 

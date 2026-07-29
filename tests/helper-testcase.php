@@ -1,13 +1,14 @@
 <?php
 /**
- * Shared harness for the rendering tests.
+ * The base class every test in this plugin extends.
  *
  * @package WP-CommentNavi
  */
 
 /**
- * Sets up a singular request with a known comment count and captures what the
- * template tag prints.
+ * Puts every test back on an unconfigured install, and sets up a singular
+ * request with a known comment count so the template tag has something to
+ * paginate.
  *
  * The tag reads $wp_query->comment_count and $wp_query->max_num_comment_pages,
  * which core only populates inside comments_template(). Rather than render a
@@ -16,7 +17,7 @@
  * next_comments_link() need in order to build URLs at all -- and then assigns
  * those two properties directly, exactly as comments_template() would.
  */
-abstract class CommentNavi_TestCase extends WP_UnitTestCase {
+class WP_CommentNavi_TestCase extends WP_UnitTestCase {
 
 	/**
 	 * The post the navigation is rendered against.
@@ -47,6 +48,26 @@ abstract class CommentNavi_TestCase extends WP_UnitTestCase {
 		delete_option( WP_CommentNavi_Options::OPTION );
 		delete_option( WP_CommentNavi_Options::VERSION );
 		delete_option( WP_CommentNavi_Options::LEGACY_OPTION );
+	}
+
+	/**
+	 * Absolute path to a file in the plugin directory.
+	 *
+	 * @param string $relative Path relative to the plugin root.
+	 * @return string
+	 */
+	protected function plugin_path( $relative = '' ) {
+		return rtrim( dirname( __DIR__ ) . '/' . ltrim( $relative, '/' ), '/' );
+	}
+
+	/**
+	 * The contents of a file in the plugin directory.
+	 *
+	 * @param string $relative Path relative to the plugin root.
+	 * @return string
+	 */
+	protected function plugin_file_contents( $relative ) {
+		return (string) file_get_contents( $this->plugin_path( $relative ) );
 	}
 
 	/**

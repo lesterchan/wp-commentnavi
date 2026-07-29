@@ -9,7 +9,7 @@
  *
  * That notice is a fact about the test theme rather than about this plugin, and
  * declaring it would tie the tests to whichever theme the suite happens to run
- * under. Test_CommentNavi_Integration points the 'comments_template' filter here
+ * under. WP_CommentNavi_Integration_Test points the 'comments_template' filter here
  * instead. Core checks file_exists() on the filtered path first, so this file is
  * included in place of the deprecated fallback.
  *
