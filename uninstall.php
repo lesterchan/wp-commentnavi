@@ -5,9 +5,7 @@
  * @package WP-CommentNavi
  */
 
-if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
-	exit();
-}
+defined( 'WP_UNINSTALL_PLUGIN' ) || exit;
 
 /**
  * Delete the plugin's options for the current site.
@@ -15,6 +13,12 @@ if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
  * @return void
  */
 function wp_commentnavi_uninstall_site() {
+	delete_option( 'wp_commentnavi_options' );
+	delete_option( 'wp_commentnavi_version' );
+
+	// The settings row was called commentnavi_options up to 1.12.2. The upgrade
+	// routine deletes it, so this only catches an install that never reached
+	// wp-admin between updating and being removed.
 	delete_option( 'commentnavi_options' );
 }
 

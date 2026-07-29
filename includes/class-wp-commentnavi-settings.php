@@ -24,7 +24,7 @@ class WP_CommentNavi_Settings {
 	 *
 	 * @var string
 	 */
-	const GROUP = 'commentnavi_options';
+	const GROUP = 'wp_commentnavi_options';
 
 	/**
 	 * The settings page slug.
@@ -54,6 +54,11 @@ class WP_CommentNavi_Settings {
 	public static function init() {
 		add_action( 'admin_menu', array( __CLASS__, 'add_page' ) );
 		add_action( 'admin_init', array( __CLASS__, 'register_settings' ) );
+
+		// Activation hooks do not fire when a plugin is updated, so the upgrade
+		// routine is also run on every admin load.
+		add_action( 'admin_init', array( 'WP_CommentNavi_Options', 'maybe_upgrade' ) );
+
 		add_filter( 'plugin_action_links_' . plugin_basename( WP_COMMENTNAVI_MAIN_FILE ), array( __CLASS__, 'action_links' ) );
 	}
 
@@ -102,7 +107,7 @@ class WP_CommentNavi_Settings {
 			WP_CommentNavi_Options::OPTION,
 			array(
 				'type'              => 'array',
-				'sanitize_callback' => array( __CLASS__, 'sanitize' ),
+				'sanitize_callback' => array( 'WP_CommentNavi_Options', 'sanitize' ),
 			)
 		);
 
@@ -418,48 +423,5 @@ class WP_CommentNavi_Settings {
 			</form>
 		</div>
 		<?php
-	}
-
-	/**
-	 * Validate and clean the submitted settings.
-	 *
-	 * Values missing from the submission fall back to what is already stored, so
-	 * a partial POST never wipes a setting.
-	 *
-	 * Note what is absent: the pre-2.0.0 handler wrapped every value in
-	 * addslashes() on top of the slashes WordPress already adds to $_POST, then
-	 * stripped one layer back off for display. The front end stripped nothing, so
-	 * an apostrophe grew a backslash on the site itself with every save. The
-	 * Settings API hands this callback unslashed data, so it is stored as typed.
-	 *
-	 * @param mixed $input Raw submitted values.
-	 * @return array
-	 */
-	public static function sanitize( $input ) {
-		$options = wp_parse_args( is_array( $input ) ? $input : array(), WP_CommentNavi_Options::get() );
-
-		// Keep only keys the plugin actually defines. Without this a hand-crafted
-		// post to options.php would have its extra keys stored in the option row
-		// forever.
-		$options = array_intersect_key( $options, WP_CommentNavi_Options::get_defaults() );
-
-		foreach ( WP_CommentNavi_Options::int_keys() as $key ) {
-			$value           = isset( $options[ $key ] ) && is_scalar( $options[ $key ] ) ? $options[ $key ] : 0;
-			$options[ $key ] = absint( $value );
-		}
-
-		foreach ( WP_CommentNavi_Options::bool_keys() as $key ) {
-			$value           = isset( $options[ $key ] ) && is_scalar( $options[ $key ] ) ? $options[ $key ] : 0;
-			$options[ $key ] = intval( $value );
-		}
-
-		// The same allow-list the renderer uses, so an SVG arrow typed into the
-		// settings screen survives exactly as one passed through the 'options'
-		// argument does.
-		foreach ( WP_CommentNavi_Options::text_keys() as $key ) {
-			$options[ $key ] = WP_CommentNavi_Options::kses( isset( $options[ $key ] ) ? $options[ $key ] : '' );
-		}
-
-		return $options;
 	}
 }

@@ -141,7 +141,7 @@ class Test_CommentNavi_Security extends CommentNavi_TestCase {
 	 */
 	public function test_partial_option_row_renders_without_notices() {
 		update_option(
-			'commentnavi_options',
+			WP_CommentNavi_Options::OPTION,
 			array(
 				'pages_text' => 'Page %CURRENT_PAGE% of %TOTAL_PAGES%',
 				'style'      => 1,
@@ -165,7 +165,7 @@ class Test_CommentNavi_Security extends CommentNavi_TestCase {
 	 * @return void
 	 */
 	public function test_missing_option_row_falls_back_to_defaults() {
-		delete_option( 'commentnavi_options' );
+		delete_option( WP_CommentNavi_Options::OPTION );
 
 		$html = $this->render(
 			array(

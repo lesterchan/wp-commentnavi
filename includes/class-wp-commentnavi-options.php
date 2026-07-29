@@ -20,7 +20,25 @@ class WP_CommentNavi_Options {
 	 *
 	 * @var string
 	 */
-	const OPTION = 'commentnavi_options';
+	const OPTION = 'wp_commentnavi_options';
+
+	/**
+	 * The option row holding the 'plugin' and 'db' version markers.
+	 *
+	 * @var string
+	 */
+	const VERSION = 'wp_commentnavi_version';
+
+	/**
+	 * The settings row every release up to 1.12.2 wrote.
+	 *
+	 * It was named after the plugin without the wp- prefix, so it did not say
+	 * which plugin owned it. The upgrade routine folds it into OPTION and
+	 * deletes it.
+	 *
+	 * @var string
+	 */
+	const LEGACY_OPTION = 'commentnavi_options';
 
 	/**
 	 * Option keys whose values are rendered as HTML and so must pass through kses.
@@ -305,5 +323,125 @@ class WP_CommentNavi_Options {
 	 */
 	public static function update( array $options ) {
 		return update_option( self::OPTION, $options );
+	}
+
+	/**
+	 * Get the version markers.
+	 *
+	 * @return array The 'plugin' and 'db' markers, each an empty string when unset.
+	 */
+	public static function get_versions() {
+		$stored = get_option( self::VERSION, array() );
+
+		if ( ! is_array( $stored ) ) {
+			$stored = array();
+		}
+
+		return array(
+			'plugin' => isset( $stored['plugin'] ) ? (string) $stored['plugin'] : '',
+			'db'     => isset( $stored['db'] ) ? (string) $stored['db'] : '',
+		);
+	}
+
+	/**
+	 * Clean a full set of submitted settings.
+	 *
+	 * Also used as register_setting()'s sanitize_callback, which receives the whole
+	 * nested array in one go. It reads nothing back out of the database: the version
+	 * markers live in their own row, so there is nothing here to rescue and nothing
+	 * this can corrupt. Anything the submission left out falls back to its default
+	 * rather than to whatever happens to be stored.
+	 *
+	 * Note what else is absent: the pre-2.0.0 handler wrapped every value in
+	 * addslashes() on top of the slashes WordPress already adds to $_POST, then
+	 * stripped one layer back off for display. The front end stripped nothing, so an
+	 * apostrophe grew a backslash on the site itself with every save. The Settings
+	 * API hands this callback unslashed data, so it is stored as typed.
+	 *
+	 * @param mixed $input Raw submitted values.
+	 * @return array
+	 */
+	public static function sanitize( $input ) {
+		$defaults = self::get_defaults();
+
+		// Keep only keys the plugin actually defines. Without this a hand-crafted
+		// post to options.php would have its extra keys stored in the option row
+		// forever.
+		$options = wp_parse_args(
+			is_array( $input ) ? array_intersect_key( $input, $defaults ) : array(),
+			$defaults
+		);
+
+		foreach ( array_merge( self::int_keys(), self::bool_keys() ) as $key ) {
+			$options[ $key ] = absint( is_scalar( $options[ $key ] ) ? $options[ $key ] : 0 );
+		}
+
+		// The same allow-list the renderer uses, so an SVG arrow typed into the
+		// settings screen survives exactly as one passed through the 'options'
+		// argument does.
+		foreach ( self::text_keys() as $key ) {
+			$options[ $key ] = self::kses( $options[ $key ] );
+		}
+
+		return $options;
+	}
+
+	/**
+	 * Bring the stored rows up to date with the running code.
+	 *
+	 * Runs on activation and on every admin load, because activation hooks do not
+	 * fire when a plugin is updated -- which is the usual reason a migration never
+	 * runs. Idempotent.
+	 *
+	 * Both markers are written together in one update_option() at the very end, so
+	 * a half-finished upgrade never records itself as complete.
+	 *
+	 * @return void
+	 */
+	public static function maybe_upgrade() {
+		$versions = self::get_versions();
+
+		if ( WP_COMMENTNAVI_VERSION === $versions['plugin'] && WP_COMMENTNAVI_DB_VERSION === $versions['db'] ) {
+			return;
+		}
+
+		self::migrate();
+
+		update_option(
+			self::VERSION,
+			array(
+				'plugin' => WP_COMMENTNAVI_VERSION,
+				'db'     => WP_COMMENTNAVI_DB_VERSION,
+			)
+		);
+	}
+
+	/**
+	 * Fold the pre-2.0.0 settings row into the current one.
+	 *
+	 * The old row is read once, folded in and deleted; re-running finds nothing
+	 * left to do. Settings are re-sanitised on the way through, so an upgrade
+	 * cleans a row that an older, laxer version wrote just as thoroughly as a save
+	 * would -- which matters here, because every release up to 1.12.2 stored the
+	 * navigation text with no output filtering at all.
+	 *
+	 * @return void
+	 */
+	protected static function migrate() {
+		$legacy = get_option( self::LEGACY_OPTION );
+
+		if ( false !== $legacy ) {
+			if ( false === get_option( self::OPTION ) ) {
+				update_option( self::OPTION, self::sanitize( $legacy ) );
+			}
+
+			delete_option( self::LEGACY_OPTION );
+		}
+
+		$stored = get_option( self::OPTION );
+
+		if ( false !== $stored ) {
+			update_option( self::OPTION, self::sanitize( $stored ) );
+		}
 	}
 }

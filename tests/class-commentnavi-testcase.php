@@ -44,7 +44,9 @@ abstract class CommentNavi_TestCase extends WP_UnitTestCase {
 		update_option( 'comments_per_page', 10 );
 		update_option( 'default_comments_page', 'newest' );
 
-		delete_option( 'commentnavi_options' );
+		delete_option( WP_CommentNavi_Options::OPTION );
+		delete_option( WP_CommentNavi_Options::VERSION );
+		delete_option( WP_CommentNavi_Options::LEGACY_OPTION );
 	}
 
 	/**
@@ -88,7 +90,7 @@ abstract class CommentNavi_TestCase extends WP_UnitTestCase {
 	 * @return void
 	 */
 	protected function set_options( array $overrides = array() ) {
-		update_option( 'commentnavi_options', array_merge( $this->default_options(), $overrides ) );
+		update_option( WP_CommentNavi_Options::OPTION, array_merge( $this->default_options(), $overrides ) );
 	}
 
 	/**

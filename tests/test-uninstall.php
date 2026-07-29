@@ -27,20 +27,34 @@ class Test_CommentNavi_Uninstall extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Running the uninstaller removes the plugin's only option row.
+	 * Running the uninstaller removes all three of the rows the plugin can leave
+	 * behind: the settings, the version markers and the pre-2.0.0 settings row.
 	 *
 	 * @return void
 	 */
-	public function test_uninstall_deletes_the_option() {
-		update_option( 'commentnavi_options', array( 'style' => 1 ) );
-		$this->assertIsArray( get_option( 'commentnavi_options' ) );
-
+	public function test_uninstall_deletes_every_row() {
 		if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
 			define( 'WP_UNINSTALL_PLUGIN', 'wp-commentnavi/wp-commentnavi.php' );
 		}
+
+		// require_once: the suite runs in one process, and a second require would
+		// redeclare wp_commentnavi_uninstall_site() and fatal. The rows are written
+		// after it, so the deletion under test is the explicit call below rather
+		// than whatever the file did on the way in.
 		require_once dirname( __DIR__ ) . '/uninstall.php';
 
-		$this->assertFalse( get_option( 'commentnavi_options' ) );
+		WP_CommentNavi_Options::update( array( 'style' => 1 ) );
+		WP_CommentNavi_Options::maybe_upgrade();
+		update_option( WP_CommentNavi_Options::LEGACY_OPTION, array( 'style' => 1 ) );
+
+		$this->assertIsArray( get_option( WP_CommentNavi_Options::OPTION ) );
+		$this->assertIsArray( get_option( WP_CommentNavi_Options::VERSION ) );
+
+		wp_commentnavi_uninstall_site();
+
+		$this->assertFalse( get_option( WP_CommentNavi_Options::OPTION ) );
+		$this->assertFalse( get_option( WP_CommentNavi_Options::VERSION ) );
+		$this->assertFalse( get_option( WP_CommentNavi_Options::LEGACY_OPTION ) );
 	}
 
 	/**

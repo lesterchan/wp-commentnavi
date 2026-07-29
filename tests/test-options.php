@@ -18,16 +18,145 @@ class Test_CommentNavi_Options extends WP_UnitTestCase {
 	public function set_up() {
 		parent::set_up();
 		delete_option( WP_CommentNavi_Options::OPTION );
+		delete_option( WP_CommentNavi_Options::VERSION );
+		delete_option( WP_CommentNavi_Options::LEGACY_OPTION );
 	}
 
 	/**
-	 * The option key must never change: it is what carries existing installs
-	 * across the 2.0.0 upgrade without a migration.
+	 * The option rows are named after the plugin, not after a bare noun.
 	 *
 	 * @return void
 	 */
-	public function test_option_key_is_unchanged() {
-		$this->assertSame( 'commentnavi_options', WP_CommentNavi_Options::OPTION );
+	public function test_option_rows_carry_the_plugin_prefix() {
+		$this->assertSame( 'wp_commentnavi_options', WP_CommentNavi_Options::OPTION );
+		$this->assertSame( 'wp_commentnavi_version', WP_CommentNavi_Options::VERSION );
+		$this->assertSame( 'commentnavi_options', WP_CommentNavi_Options::LEGACY_OPTION );
+	}
+
+	/**
+	 * Upgrading folds the pre-2.0.0 row into the new one and deletes the old one.
+	 *
+	 * @return void
+	 */
+	public function test_the_upgrade_moves_the_legacy_row() {
+		update_option(
+			WP_CommentNavi_Options::LEGACY_OPTION,
+			array(
+				'num_pages' => 9,
+				'style'     => 2,
+			)
+		);
+
+		WP_CommentNavi_Options::maybe_upgrade();
+
+		$this->assertFalse(
+			get_option( WP_CommentNavi_Options::LEGACY_OPTION ),
+			'the pre-2.0.0 settings row survived the upgrade.'
+		);
+		$this->assertSame( 9, WP_CommentNavi_Options::get( 'num_pages' ), 'the legacy settings were not carried over.' );
+		$this->assertSame( 2, WP_CommentNavi_Options::get( 'style' ), 'the legacy settings were not carried over.' );
+	}
+
+	/**
+	 * A settings row already in the new name is never overwritten by a stale
+	 * legacy row that was left behind.
+	 *
+	 * @return void
+	 */
+	public function test_the_upgrade_does_not_overwrite_the_new_row() {
+		WP_CommentNavi_Options::update(
+			array_merge( WP_CommentNavi_Options::get_defaults(), array( 'num_pages' => 7 ) )
+		);
+		update_option( WP_CommentNavi_Options::LEGACY_OPTION, array( 'num_pages' => 9 ) );
+
+		WP_CommentNavi_Options::maybe_upgrade();
+
+		$this->assertSame( 7, WP_CommentNavi_Options::get( 'num_pages' ) );
+		$this->assertFalse( get_option( WP_CommentNavi_Options::LEGACY_OPTION ) );
+	}
+
+	/**
+	 * Running the upgrade twice changes nothing the second time.
+	 *
+	 * @return void
+	 */
+	public function test_the_upgrade_is_idempotent() {
+		update_option( WP_CommentNavi_Options::LEGACY_OPTION, array( 'num_pages' => 9 ) );
+
+		WP_CommentNavi_Options::maybe_upgrade();
+		$first = WP_CommentNavi_Options::get();
+
+		WP_CommentNavi_Options::maybe_upgrade();
+
+		$this->assertSame( $first, WP_CommentNavi_Options::get() );
+	}
+
+	/**
+	 * The upgrade re-sanitises what it finds, so markup an older and laxer
+	 * release stored is cleaned without anyone visiting the settings screen.
+	 *
+	 * @return void
+	 */
+	public function test_the_upgrade_resanitises_the_settings() {
+		update_option(
+			WP_CommentNavi_Options::LEGACY_OPTION,
+			array( 'pages_text' => 'Page <script>alert(1)</script>' )
+		);
+
+		WP_CommentNavi_Options::maybe_upgrade();
+
+		$this->assertStringNotContainsString( '<script', WP_CommentNavi_Options::get( 'pages_text' ) );
+	}
+
+	/**
+	 * The version markers land in their own row rather than in the settings.
+	 *
+	 * @return void
+	 */
+	public function test_the_upgrade_stamps_the_version_markers() {
+		WP_CommentNavi_Options::maybe_upgrade();
+
+		$this->assertSame(
+			array(
+				'plugin' => WP_COMMENTNAVI_VERSION,
+				'db'     => WP_COMMENTNAVI_DB_VERSION,
+			),
+			get_option( WP_CommentNavi_Options::VERSION )
+		);
+		$this->assertArrayNotHasKey( 'plugin', WP_CommentNavi_Options::get() );
+		$this->assertArrayNotHasKey( 'db', WP_CommentNavi_Options::get() );
+	}
+
+	/**
+	 * With no row at all, both markers read as empty strings rather than raising.
+	 *
+	 * @return void
+	 */
+	public function test_version_markers_default_to_empty_strings() {
+		$this->assertSame(
+			array(
+				'plugin' => '',
+				'db'     => '',
+			),
+			WP_CommentNavi_Options::get_versions()
+		);
+	}
+
+	/**
+	 * A corrupt version row is read as if it were absent.
+	 *
+	 * @return void
+	 */
+	public function test_a_corrupt_version_row_reads_as_empty() {
+		update_option( WP_CommentNavi_Options::VERSION, 'not an array' );
+
+		$this->assertSame(
+			array(
+				'plugin' => '',
+				'db'     => '',
+			),
+			WP_CommentNavi_Options::get_versions()
+		);
 	}
 
 	/**

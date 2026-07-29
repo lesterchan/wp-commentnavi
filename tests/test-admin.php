@@ -18,6 +18,8 @@ class Test_CommentNavi_Admin extends WP_UnitTestCase {
 	public function set_up() {
 		parent::set_up();
 		delete_option( WP_CommentNavi_Options::OPTION );
+		delete_option( WP_CommentNavi_Options::VERSION );
+		delete_option( WP_CommentNavi_Options::LEGACY_OPTION );
 	}
 
 	/**
@@ -85,7 +87,7 @@ class Test_CommentNavi_Admin extends WP_UnitTestCase {
 	 * @return void
 	 */
 	public function test_apostrophe_is_stored_as_typed() {
-		$clean = WP_CommentNavi_Settings::sanitize( array( 'first_text' => "O'Brien &laquo; First" ) );
+		$clean = WP_CommentNavi_Options::sanitize( array( 'first_text' => "O'Brien &laquo; First" ) );
 
 		$this->assertSame( "O'Brien &laquo; First", $clean['first_text'] );
 		$this->assertStringNotContainsString( '\\', $clean['first_text'] );
@@ -97,8 +99,8 @@ class Test_CommentNavi_Admin extends WP_UnitTestCase {
 	 * @return void
 	 */
 	public function test_saving_twice_is_stable() {
-		$once  = WP_CommentNavi_Settings::sanitize( array( 'prev_text' => "it's &laquo;" ) );
-		$twice = WP_CommentNavi_Settings::sanitize( $once );
+		$once  = WP_CommentNavi_Options::sanitize( array( 'prev_text' => "it's &laquo;" ) );
+		$twice = WP_CommentNavi_Options::sanitize( $once );
 
 		$this->assertSame( $once['prev_text'], $twice['prev_text'] );
 	}
@@ -109,7 +111,7 @@ class Test_CommentNavi_Admin extends WP_UnitTestCase {
 	 * @return void
 	 */
 	public function test_unknown_keys_are_discarded() {
-		$clean = WP_CommentNavi_Settings::sanitize(
+		$clean = WP_CommentNavi_Options::sanitize(
 			array(
 				'num_pages'   => 4,
 				'evil_key'    => 'payload',
@@ -123,19 +125,30 @@ class Test_CommentNavi_Admin extends WP_UnitTestCase {
 	}
 
 	/**
-	 * A partial submission leaves the settings it did not mention alone.
+	 * A partial submission fills the settings it did not mention from the
+	 * defaults, not from what happens to be stored.
+	 *
+	 * The sanitiser is a function from what the form posted to what gets stored
+	 * and reads nothing back out of the database, which is what stops a version
+	 * marker or any other row's value being dragged in behind it. The settings
+	 * form posts every field, so a partial submission only ever arrives from a
+	 * hand-crafted request.
 	 *
 	 * @return void
 	 */
-	public function test_partial_submission_preserves_other_settings() {
+	public function test_partial_submission_falls_back_to_the_defaults() {
 		WP_CommentNavi_Options::update(
 			array_merge( WP_CommentNavi_Options::get_defaults(), array( 'num_pages' => 11 ) )
 		);
 
-		$clean = WP_CommentNavi_Settings::sanitize( array( 'style' => 2 ) );
+		$clean = WP_CommentNavi_Options::sanitize( array( 'style' => 2 ) );
 
 		$this->assertSame( 2, $clean['style'] );
-		$this->assertSame( 11, $clean['num_pages'] );
+		$this->assertSame(
+			WP_CommentNavi_Options::get_defaults()['num_pages'],
+			$clean['num_pages'],
+			'the sanitiser reached back into the stored row instead of the defaults.'
+		);
 	}
 
 	/**
@@ -144,7 +157,7 @@ class Test_CommentNavi_Admin extends WP_UnitTestCase {
 	 * @return void
 	 */
 	public function test_integer_settings_are_cast() {
-		$clean = WP_CommentNavi_Settings::sanitize(
+		$clean = WP_CommentNavi_Options::sanitize(
 			array(
 				'num_pages'               => '7',
 				'num_larger_page_numbers' => '-3',
@@ -161,7 +174,7 @@ class Test_CommentNavi_Admin extends WP_UnitTestCase {
 	 * @return void
 	 */
 	public function test_scripts_are_stripped_on_save() {
-		$clean = WP_CommentNavi_Settings::sanitize( array( 'pages_text' => 'Page <script>alert(1)</script>' ) );
+		$clean = WP_CommentNavi_Options::sanitize( array( 'pages_text' => 'Page <script>alert(1)</script>' ) );
 
 		$this->assertStringNotContainsString( '<script', $clean['pages_text'] );
 	}
@@ -172,7 +185,7 @@ class Test_CommentNavi_Admin extends WP_UnitTestCase {
 	 * @return void
 	 */
 	public function test_array_posted_into_a_text_setting() {
-		$clean = WP_CommentNavi_Settings::sanitize( array( 'prev_text' => array( 'x' ) ) );
+		$clean = WP_CommentNavi_Options::sanitize( array( 'prev_text' => array( 'x' ) ) );
 
 		$this->assertSame( '', $clean['prev_text'] );
 	}

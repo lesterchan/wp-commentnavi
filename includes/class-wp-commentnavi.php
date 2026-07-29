@@ -39,11 +39,12 @@ class WP_CommentNavi {
 	}
 
 	/**
-	 * Seed the option row on activation.
+	 * Activation: run the upgrade routine so the rows are in their current shape.
 	 *
-	 * Calling add_option() leaves an existing row alone, and the options are merged
-	 * over the defaults on every read anyway, so this is a convenience rather than
-	 * a requirement — the plugin works correctly with no row at all.
+	 * That folds in the pre-2.0.0 settings row and stamps the version markers. The
+	 * plugin works correctly with no settings row at all, because the options are
+	 * merged over the defaults on every read, so this is about carrying an existing
+	 * install forward rather than about seeding a new one.
 	 *
 	 * The network branch replaces a wp_get_sites() call that WordPress removed in
 	 * 5.1, which made network activation a fatal error. 'number' => 0 lifts
@@ -64,13 +65,13 @@ class WP_CommentNavi {
 
 			foreach ( $site_ids as $site_id ) {
 				switch_to_blog( (int) $site_id );
-				add_option( WP_CommentNavi_Options::OPTION, WP_CommentNavi_Options::get_defaults() );
+				WP_CommentNavi_Options::maybe_upgrade();
 				restore_current_blog();
 			}
 
 			return;
 		}
 
-		add_option( WP_CommentNavi_Options::OPTION, WP_CommentNavi_Options::get_defaults() );
+		WP_CommentNavi_Options::maybe_upgrade();
 	}
 }
