@@ -37,8 +37,10 @@ class Test_CommentNavi_Security extends CommentNavi_TestCase {
 		$xpath = new DOMXPath( $doc );
 		$found = array();
 
+		// name() rather than ->tagName: DOM spells its properties in camel case and
+		// the coding standard requires snake_case for every property read.
 		foreach ( $xpath->query( '//*[@onmouseover or @onclick or @onerror or @onload or @onfocus]' ) as $el ) {
-			$found[] = $el->tagName;
+			$found[] = (string) $xpath->evaluate( 'name(.)', $el );
 		}
 
 		$this->assertSame(

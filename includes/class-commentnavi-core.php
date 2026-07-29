@@ -204,16 +204,12 @@ class CommentNavi_Core {
 		}
 
 		/*
-		 * The four navigation aria-labels below are deliberately read from the
-		 * 'default' (WordPress core) text domain rather than this plugin's, so they
-		 * arrive already translated in every locale core supports instead of waiting
-		 * on this plugin's own catalogue. The domain is passed explicitly rather
-		 * than omitted so the intent is obvious and the i18n sniff stays satisfied.
-		 *
-		 * The casing matters and is not a typo: core spells these 'First page' and
-		 * 'Last page' with a lowercase p, but 'Previous Page' and 'Next Page' with a
-		 * capital one. Only the exact string resolves, so each label has to match
-		 * core's own spelling.
+		 * The four navigation aria-labels below use this plugin's own text domain.
+		 * Reading them from core's 'default' domain would have them arrive already
+		 * translated everywhere core is, but a plugin may only ship strings in its
+		 * own domain: the shared coding standard pins one text domain per plugin,
+		 * and borrowing core's makes the strings invisible to this plugin's own
+		 * catalogue on translate.wordpress.org.
 		 */
 
 		if ( $start_page >= 2 && $pages_to_show < $total_pages ) {
@@ -224,7 +220,7 @@ class CommentNavi_Core {
 				$first_text,
 				array(
 					'class'      => $class_names['first'],
-					'aria-label' => __( 'First page', 'default' ),
+					'aria-label' => __( 'First page', 'wp-commentnavi' ),
 				),
 				'%TOTAL_PAGES%'
 			);
@@ -238,7 +234,7 @@ class CommentNavi_Core {
 				array(
 					'class'      => $class_names['previouscommentslink'],
 					'rel'        => 'prev',
-					'aria-label' => __( 'Previous Page', 'default' ),
+					'aria-label' => __( 'Previous Page', 'wp-commentnavi' ),
 				)
 			);
 		}
@@ -334,7 +330,7 @@ class CommentNavi_Core {
 				array(
 					'class'      => $class_names['nextcommentslink'],
 					'rel'        => 'next',
-					'aria-label' => __( 'Next Page', 'default' ),
+					'aria-label' => __( 'Next Page', 'wp-commentnavi' ),
 				)
 			);
 		}
@@ -346,7 +342,7 @@ class CommentNavi_Core {
 				$options['last_text'],
 				array(
 					'class'      => $class_names['last'],
-					'aria-label' => __( 'Last page', 'default' ),
+					'aria-label' => __( 'Last page', 'wp-commentnavi' ),
 				),
 				'%TOTAL_PAGES%'
 			);

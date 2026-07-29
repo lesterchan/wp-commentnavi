@@ -156,11 +156,14 @@ abstract class CommentNavi_TestCase extends WP_UnitTestCase {
 		$xpath = new DOMXPath( $doc );
 		$out   = array();
 
+		// name() and string() are asked of XPath rather than read off the node as
+		// ->tagName and ->textContent, because DOM spells its properties in camel
+		// case and the coding standard requires snake_case for every property read.
 		foreach ( $xpath->query( '//a | //span | //option | //select' ) as $el ) {
 			$out[] = array(
-				'tag'   => $el->tagName,
+				'tag'   => (string) $xpath->evaluate( 'name(.)', $el ),
 				'class' => $el->getAttribute( 'class' ),
-				'text'  => trim( $el->textContent ),
+				'text'  => trim( (string) $xpath->evaluate( 'string(.)', $el ) ),
 				'href'  => $el->hasAttribute( 'href' ) ? $el->getAttribute( 'href' ) : $el->getAttribute( 'value' ),
 				'title' => $el->getAttribute( 'title' ),
 			);
