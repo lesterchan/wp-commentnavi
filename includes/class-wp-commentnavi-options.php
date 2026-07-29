@@ -8,21 +8,19 @@
 defined( 'ABSPATH' ) || exit;
 
 /**
- * Reads and writes the plugin's single option row.
+ * Reads and writes the plugin's two option rows.
  *
- * The option key is deliberately unchanged from the procedural versions, and
- * the plugin has always stored one row rather than a scattering of them, so
- * existing installs carry over without a migration. The three keys added in
- * 2.0.0 are merged in on read.
+ * Settings live in one row and the version markers in another, so the settings
+ * screen and the upgrade routine can never overwrite each other's work.
  */
-class CommentNavi_Options {
+class WP_CommentNavi_Options {
 
 	/**
-	 * The option key. Unchanged since the plugin's first release.
+	 * The option row holding every setting, as a nested array.
 	 *
 	 * @var string
 	 */
-	const OPTION_NAME = 'commentnavi_options';
+	const OPTION = 'commentnavi_options';
 
 	/**
 	 * Option keys whose values are rendered as HTML and so must pass through kses.
@@ -75,7 +73,7 @@ class CommentNavi_Options {
 	 * This is wp_kses_post()'s list plus the inline SVG elements. Themes commonly
 	 * use an inline SVG for the previous and next arrows, and wp_kses_post()
 	 * removes an SVG completely rather than cleaning it — which leaves the text
-	 * empty, and CommentNavi_Call::get_single() drops a link whose text is empty.
+	 * empty, and WP_CommentNavi_Call::get_single() drops a link whose text is empty.
 	 * The result is that the whole link disappears from the page, not just the
 	 * icon.
 	 *
@@ -289,7 +287,7 @@ class CommentNavi_Options {
 	 * @return mixed The full option array, or one value, or null for an unknown key.
 	 */
 	public static function get( $key = null ) {
-		$stored  = get_option( self::OPTION_NAME, array() );
+		$stored  = get_option( self::OPTION, array() );
 		$options = wp_parse_args( is_array( $stored ) ? $stored : array(), self::get_defaults() );
 
 		if ( null === $key ) {
@@ -306,6 +304,6 @@ class CommentNavi_Options {
 	 * @return bool Whether the option row changed.
 	 */
 	public static function update( array $options ) {
-		return update_option( self::OPTION_NAME, $options );
+		return update_option( self::OPTION, $options );
 	}
 }

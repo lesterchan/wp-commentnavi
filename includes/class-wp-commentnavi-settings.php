@@ -14,17 +14,20 @@ defined( 'ABSPATH' ) || exit;
  * admin.php?page=wp-commentnavi/commentnavi-options.php, handled $_POST inline
  * and added a layer of slashes on every save.
  */
-class CommentNavi_Admin {
+class WP_CommentNavi_Settings {
 
 	/**
 	 * Settings group passed to register_setting() and settings_fields().
 	 *
+	 * The group is named after the settings row it writes, so there is one
+	 * spelling to remember rather than two.
+	 *
 	 * @var string
 	 */
-	const OPTION_GROUP = 'commentnavi_options_group';
+	const GROUP = 'commentnavi_options';
 
 	/**
-	 * The page slug.
+	 * The settings page slug.
 	 *
 	 * Before 2.0.0 the menu was registered with the plugin file as its slug, in
 	 * the legacy 'wp-commentnavi/commentnavi-options.php' form, which put the
@@ -34,7 +37,14 @@ class CommentNavi_Admin {
 	 *
 	 * @var string
 	 */
-	const PAGE_SLUG = 'commentnavi';
+	const PAGE = 'wp-commentnavi';
+
+	/**
+	 * The capability required to see and save the settings.
+	 *
+	 * @var string
+	 */
+	const CAPABILITY = 'manage_options';
 
 	/**
 	 * Hook the admin screen into WordPress.
@@ -57,7 +67,7 @@ class CommentNavi_Admin {
 			__( 'CommentNavi Settings', 'wp-commentnavi' ),
 			__( 'CommentNavi', 'wp-commentnavi' ),
 			'manage_options',
-			self::PAGE_SLUG,
+			self::PAGE,
 			array( __CLASS__, 'render_page' )
 		);
 	}
@@ -75,7 +85,7 @@ class CommentNavi_Admin {
 
 		array_unshift(
 			$links,
-			'<a href="' . esc_url( admin_url( 'options-general.php?page=' . self::PAGE_SLUG ) ) . '">' . esc_html__( 'Settings', 'wp-commentnavi' ) . '</a>'
+			'<a href="' . esc_url( admin_url( 'options-general.php?page=' . self::PAGE ) ) . '">' . esc_html__( 'Settings', 'wp-commentnavi' ) . '</a>'
 		);
 
 		return $links;
@@ -88,8 +98,8 @@ class CommentNavi_Admin {
 	 */
 	public static function register_settings() {
 		register_setting(
-			self::OPTION_GROUP,
-			CommentNavi_Options::OPTION_NAME,
+			self::GROUP,
+			WP_CommentNavi_Options::OPTION,
 			array(
 				'type'              => 'array',
 				'sanitize_callback' => array( __CLASS__, 'sanitize' ),
@@ -100,14 +110,14 @@ class CommentNavi_Admin {
 			'commentnavi_text',
 			__( 'Comment Navigation Text', 'wp-commentnavi' ),
 			array( __CLASS__, 'text_section_intro' ),
-			self::PAGE_SLUG
+			self::PAGE
 		);
 
 		add_settings_section(
 			'commentnavi_options',
 			__( 'Comment Navigation Options', 'wp-commentnavi' ),
 			'__return_false',
-			self::PAGE_SLUG
+			self::PAGE
 		);
 
 		foreach ( self::text_fields() as $name => $field ) {
@@ -115,7 +125,7 @@ class CommentNavi_Admin {
 				$name,
 				$field['title'],
 				array( __CLASS__, 'render_text_field' ),
-				self::PAGE_SLUG,
+				self::PAGE,
 				'commentnavi_text',
 				array(
 					'label_for' => 'commentnavi-' . $name,
@@ -131,7 +141,7 @@ class CommentNavi_Admin {
 				$name,
 				$field['title'],
 				array( __CLASS__, 'render_' . $field['type'] . '_field' ),
-				self::PAGE_SLUG,
+				self::PAGE,
 				'commentnavi_options',
 				array(
 					'label_for' => 'commentnavi-' . $name,
@@ -273,7 +283,7 @@ class CommentNavi_Admin {
 	 * @return string
 	 */
 	protected static function field_name( $name ) {
-		return CommentNavi_Options::OPTION_NAME . '[' . $name . ']';
+		return WP_CommentNavi_Options::OPTION . '[' . $name . ']';
 	}
 
 	/**
@@ -300,7 +310,7 @@ class CommentNavi_Admin {
 	 * @return void
 	 */
 	public static function render_text_field( $args ) {
-		$value = CommentNavi_Options::get( $args['name'] );
+		$value = WP_CommentNavi_Options::get( $args['name'] );
 		$class = $args['class_'] ? $args['class_'] : 'regular-text';
 
 		printf(
@@ -323,7 +333,7 @@ class CommentNavi_Admin {
 	 * @return void
 	 */
 	public static function render_number_field( $args ) {
-		$value = CommentNavi_Options::get( $args['name'] );
+		$value = WP_CommentNavi_Options::get( $args['name'] );
 
 		printf(
 			'<input type="number" min="0" step="1" id="%1$s" name="%2$s" value="%3$s" class="%4$s" />',
@@ -343,7 +353,7 @@ class CommentNavi_Admin {
 	 * @return void
 	 */
 	public static function render_radio_field( $args ) {
-		$value = (int) CommentNavi_Options::get( $args['name'] );
+		$value = (int) WP_CommentNavi_Options::get( $args['name'] );
 
 		echo '<fieldset>';
 		foreach ( $args['choices'] as $choice => $label ) {
@@ -367,7 +377,7 @@ class CommentNavi_Admin {
 	 * @return void
 	 */
 	public static function render_select_field( $args ) {
-		$value = (int) CommentNavi_Options::get( $args['name'] );
+		$value = (int) WP_CommentNavi_Options::get( $args['name'] );
 
 		printf(
 			'<select id="%1$s" name="%2$s">',
@@ -401,8 +411,8 @@ class CommentNavi_Admin {
 			<h1><?php esc_html_e( 'CommentNavi Settings', 'wp-commentnavi' ); ?></h1>
 			<form method="post" action="options.php">
 				<?php
-				settings_fields( self::OPTION_GROUP );
-				do_settings_sections( self::PAGE_SLUG );
+				settings_fields( self::GROUP );
+				do_settings_sections( self::PAGE );
 				submit_button();
 				?>
 			</form>
@@ -426,19 +436,19 @@ class CommentNavi_Admin {
 	 * @return array
 	 */
 	public static function sanitize( $input ) {
-		$options = wp_parse_args( is_array( $input ) ? $input : array(), CommentNavi_Options::get() );
+		$options = wp_parse_args( is_array( $input ) ? $input : array(), WP_CommentNavi_Options::get() );
 
 		// Keep only keys the plugin actually defines. Without this a hand-crafted
 		// post to options.php would have its extra keys stored in the option row
 		// forever.
-		$options = array_intersect_key( $options, CommentNavi_Options::get_defaults() );
+		$options = array_intersect_key( $options, WP_CommentNavi_Options::get_defaults() );
 
-		foreach ( CommentNavi_Options::int_keys() as $key ) {
+		foreach ( WP_CommentNavi_Options::int_keys() as $key ) {
 			$value           = isset( $options[ $key ] ) && is_scalar( $options[ $key ] ) ? $options[ $key ] : 0;
 			$options[ $key ] = absint( $value );
 		}
 
-		foreach ( CommentNavi_Options::bool_keys() as $key ) {
+		foreach ( WP_CommentNavi_Options::bool_keys() as $key ) {
 			$value           = isset( $options[ $key ] ) && is_scalar( $options[ $key ] ) ? $options[ $key ] : 0;
 			$options[ $key ] = intval( $value );
 		}
@@ -446,8 +456,8 @@ class CommentNavi_Admin {
 		// The same allow-list the renderer uses, so an SVG arrow typed into the
 		// settings screen survives exactly as one passed through the 'options'
 		// argument does.
-		foreach ( CommentNavi_Options::text_keys() as $key ) {
-			$options[ $key ] = CommentNavi_Options::kses( isset( $options[ $key ] ) ? $options[ $key ] : '' );
+		foreach ( WP_CommentNavi_Options::text_keys() as $key ) {
+			$options[ $key ] = WP_CommentNavi_Options::kses( isset( $options[ $key ] ) ? $options[ $key ] : '' );
 		}
 
 		return $options;

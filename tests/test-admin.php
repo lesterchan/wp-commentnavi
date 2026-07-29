@@ -6,7 +6,7 @@
  */
 
 /**
- * Covers CommentNavi_Admin.
+ * Covers WP_CommentNavi_Settings.
  */
 class Test_CommentNavi_Admin extends WP_UnitTestCase {
 
@@ -17,7 +17,7 @@ class Test_CommentNavi_Admin extends WP_UnitTestCase {
 	 */
 	public function set_up() {
 		parent::set_up();
-		delete_option( CommentNavi_Options::OPTION_NAME );
+		delete_option( WP_CommentNavi_Options::OPTION );
 	}
 
 	/**
@@ -42,7 +42,7 @@ class Test_CommentNavi_Admin extends WP_UnitTestCase {
 		);
 
 		ob_start();
-		CommentNavi_Admin::$method( $args );
+		WP_CommentNavi_Settings::$method( $args );
 		return ob_get_clean();
 	}
 
@@ -57,9 +57,9 @@ class Test_CommentNavi_Admin extends WP_UnitTestCase {
 	 * @return void
 	 */
 	public function test_dotleft_field_shows_dotleft_not_dotright() {
-		CommentNavi_Options::update(
+		WP_CommentNavi_Options::update(
 			array_merge(
-				CommentNavi_Options::get_defaults(),
+				WP_CommentNavi_Options::get_defaults(),
 				array(
 					'dotleft_text'  => 'LEFTDOTS',
 					'dotright_text' => 'RIGHTDOTS',
@@ -85,7 +85,7 @@ class Test_CommentNavi_Admin extends WP_UnitTestCase {
 	 * @return void
 	 */
 	public function test_apostrophe_is_stored_as_typed() {
-		$clean = CommentNavi_Admin::sanitize( array( 'first_text' => "O'Brien &laquo; First" ) );
+		$clean = WP_CommentNavi_Settings::sanitize( array( 'first_text' => "O'Brien &laquo; First" ) );
 
 		$this->assertSame( "O'Brien &laquo; First", $clean['first_text'] );
 		$this->assertStringNotContainsString( '\\', $clean['first_text'] );
@@ -97,8 +97,8 @@ class Test_CommentNavi_Admin extends WP_UnitTestCase {
 	 * @return void
 	 */
 	public function test_saving_twice_is_stable() {
-		$once  = CommentNavi_Admin::sanitize( array( 'prev_text' => "it's &laquo;" ) );
-		$twice = CommentNavi_Admin::sanitize( $once );
+		$once  = WP_CommentNavi_Settings::sanitize( array( 'prev_text' => "it's &laquo;" ) );
+		$twice = WP_CommentNavi_Settings::sanitize( $once );
 
 		$this->assertSame( $once['prev_text'], $twice['prev_text'] );
 	}
@@ -109,7 +109,7 @@ class Test_CommentNavi_Admin extends WP_UnitTestCase {
 	 * @return void
 	 */
 	public function test_unknown_keys_are_discarded() {
-		$clean = CommentNavi_Admin::sanitize(
+		$clean = WP_CommentNavi_Settings::sanitize(
 			array(
 				'num_pages'   => 4,
 				'evil_key'    => 'payload',
@@ -128,11 +128,11 @@ class Test_CommentNavi_Admin extends WP_UnitTestCase {
 	 * @return void
 	 */
 	public function test_partial_submission_preserves_other_settings() {
-		CommentNavi_Options::update(
-			array_merge( CommentNavi_Options::get_defaults(), array( 'num_pages' => 11 ) )
+		WP_CommentNavi_Options::update(
+			array_merge( WP_CommentNavi_Options::get_defaults(), array( 'num_pages' => 11 ) )
 		);
 
-		$clean = CommentNavi_Admin::sanitize( array( 'style' => 2 ) );
+		$clean = WP_CommentNavi_Settings::sanitize( array( 'style' => 2 ) );
 
 		$this->assertSame( 2, $clean['style'] );
 		$this->assertSame( 11, $clean['num_pages'] );
@@ -144,7 +144,7 @@ class Test_CommentNavi_Admin extends WP_UnitTestCase {
 	 * @return void
 	 */
 	public function test_integer_settings_are_cast() {
-		$clean = CommentNavi_Admin::sanitize(
+		$clean = WP_CommentNavi_Settings::sanitize(
 			array(
 				'num_pages'               => '7',
 				'num_larger_page_numbers' => '-3',
@@ -161,7 +161,7 @@ class Test_CommentNavi_Admin extends WP_UnitTestCase {
 	 * @return void
 	 */
 	public function test_scripts_are_stripped_on_save() {
-		$clean = CommentNavi_Admin::sanitize( array( 'pages_text' => 'Page <script>alert(1)</script>' ) );
+		$clean = WP_CommentNavi_Settings::sanitize( array( 'pages_text' => 'Page <script>alert(1)</script>' ) );
 
 		$this->assertStringNotContainsString( '<script', $clean['pages_text'] );
 	}
@@ -172,7 +172,7 @@ class Test_CommentNavi_Admin extends WP_UnitTestCase {
 	 * @return void
 	 */
 	public function test_array_posted_into_a_text_setting() {
-		$clean = CommentNavi_Admin::sanitize( array( 'prev_text' => array( 'x' ) ) );
+		$clean = WP_CommentNavi_Settings::sanitize( array( 'prev_text' => array( 'x' ) ) );
 
 		$this->assertSame( '', $clean['prev_text'] );
 	}
@@ -183,9 +183,9 @@ class Test_CommentNavi_Admin extends WP_UnitTestCase {
 	 * @return void
 	 */
 	public function test_current_values_are_preselected() {
-		CommentNavi_Options::update(
+		WP_CommentNavi_Options::update(
 			array_merge(
-				CommentNavi_Options::get_defaults(),
+				WP_CommentNavi_Options::get_defaults(),
 				array(
 					'style'       => 2,
 					'always_show' => 1,
@@ -224,9 +224,9 @@ class Test_CommentNavi_Admin extends WP_UnitTestCase {
 	 * @return void
 	 */
 	public function test_text_field_escapes_its_value() {
-		CommentNavi_Options::update(
+		WP_CommentNavi_Options::update(
 			array_merge(
-				CommentNavi_Options::get_defaults(),
+				WP_CommentNavi_Options::get_defaults(),
 				array( 'first_text' => 'x" onfocus="XSSPROBE' )
 			)
 		);
@@ -250,9 +250,9 @@ class Test_CommentNavi_Admin extends WP_UnitTestCase {
 	 * @return void
 	 */
 	public function test_page_slug_is_not_a_file_path() {
-		$this->assertSame( 'commentnavi', CommentNavi_Admin::PAGE_SLUG );
-		$this->assertStringNotContainsString( '/', CommentNavi_Admin::PAGE_SLUG );
-		$this->assertStringNotContainsString( '.php', CommentNavi_Admin::PAGE_SLUG );
+		$this->assertSame( WP_COMMENTNAVI_SLUG, WP_CommentNavi_Settings::PAGE );
+		$this->assertStringNotContainsString( '/', WP_CommentNavi_Settings::PAGE );
+		$this->assertStringNotContainsString( '.php', WP_CommentNavi_Settings::PAGE );
 	}
 
 	/**
@@ -261,9 +261,9 @@ class Test_CommentNavi_Admin extends WP_UnitTestCase {
 	 * @return void
 	 */
 	public function test_action_links() {
-		$links = CommentNavi_Admin::action_links( array( '<a href="#">Deactivate</a>' ) );
+		$links = WP_CommentNavi_Settings::action_links( array( '<a href="#">Deactivate</a>' ) );
 
 		$this->assertCount( 2, $links );
-		$this->assertStringContainsString( 'options-general.php?page=commentnavi', $links[0] );
+		$this->assertStringContainsString( 'options-general.php?page=' . WP_COMMENTNAVI_SLUG, $links[0] );
 	}
 }

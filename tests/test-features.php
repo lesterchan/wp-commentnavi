@@ -151,14 +151,14 @@ class Test_CommentNavi_Features extends CommentNavi_TestCase {
 	 */
 	public function test_stylesheet_toggle() {
 		$this->set_options( array( 'use_commentnavi_css' => 1 ) );
-		CommentNavi_Core::stylesheets();
+		WP_CommentNavi_Core::stylesheets();
 		$this->assertTrue( wp_style_is( 'wp-commentnavi', 'enqueued' ) );
 
 		wp_dequeue_style( 'wp-commentnavi' );
 		wp_deregister_style( 'wp-commentnavi' );
 
 		$this->set_options( array( 'use_commentnavi_css' => 0 ) );
-		CommentNavi_Core::stylesheets();
+		WP_CommentNavi_Core::stylesheets();
 		$this->assertFalse( wp_style_is( 'wp-commentnavi', 'enqueued' ) );
 	}
 
@@ -170,16 +170,13 @@ class Test_CommentNavi_Features extends CommentNavi_TestCase {
 	 */
 	public function test_stylesheet_url_is_not_hardcoded() {
 		$this->set_options( array( 'use_commentnavi_css' => 1 ) );
-		CommentNavi_Core::stylesheets();
+		WP_CommentNavi_Core::stylesheets();
 
 		$styles = wp_styles();
 		$src    = $styles->registered['wp-commentnavi']->src;
 
 		$this->assertStringContainsString( 'css/wp-commentnavi.css', $src );
-		$this->assertSame(
-			plugins_url( 'css/wp-commentnavi.css', WP_COMMENTNAVI_MAIN_FILE ),
-			$src
-		);
+		$this->assertSame( WP_COMMENTNAVI_URL . 'css/wp-commentnavi.css', $src );
 	}
 
 	/**
@@ -236,7 +233,7 @@ class Test_CommentNavi_Features extends CommentNavi_TestCase {
 		);
 
 		$this->assertSame( array( 1, 2, 3 ), $this->page_numbers( $markup ) );
-		$this->assertSame( 5, CommentNavi_Options::get( 'num_pages' ) );
+		$this->assertSame( 5, WP_CommentNavi_Options::get( 'num_pages' ) );
 	}
 
 	/**

@@ -11,7 +11,7 @@ defined( 'ABSPATH' ) || exit;
  * Resolves pagination figures and builds the individual page links for one call
  * to wp_commentnavi().
  */
-class CommentNavi_Call {
+class WP_CommentNavi_Call {
 
 	/**
 	 * The parsed arguments for this call.

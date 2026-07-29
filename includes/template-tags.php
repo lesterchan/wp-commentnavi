@@ -43,7 +43,7 @@ function wp_commentnavi( $args = array() ) {
 		}
 	}
 
-	return CommentNavi_Core::render( $args );
+	return WP_CommentNavi_Core::render( $args );
 }
 
 /**

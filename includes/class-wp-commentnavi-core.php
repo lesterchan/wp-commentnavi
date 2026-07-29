@@ -10,7 +10,7 @@ defined( 'ABSPATH' ) || exit;
 /**
  * Builds the comment navigation markup and enqueues the stylesheet.
  */
-class CommentNavi_Core {
+class WP_CommentNavi_Core {
 
 	/**
 	 * Hook the plugin into WordPress.
@@ -36,7 +36,7 @@ class CommentNavi_Core {
 	 * @return void
 	 */
 	public static function stylesheets() {
-		if ( ! CommentNavi_Options::get( 'use_commentnavi_css' ) ) {
+		if ( ! WP_CommentNavi_Options::get( 'use_commentnavi_css' ) ) {
 			return;
 		}
 
@@ -45,10 +45,10 @@ class CommentNavi_Core {
 		} elseif ( file_exists( get_template_directory() . '/wp-commentnavi.css' ) ) {
 			$css_file = get_template_directory_uri() . '/wp-commentnavi.css';
 		} else {
-			$css_file = plugins_url( 'css/wp-commentnavi.css', WP_COMMENTNAVI_MAIN_FILE );
+			$css_file = WP_COMMENTNAVI_URL . 'css/wp-commentnavi.css';
 		}
 
-		wp_enqueue_style( 'wp-commentnavi', $css_file, array(), WP_COMMENTNAVI_VERSION );
+		wp_enqueue_style( WP_COMMENTNAVI_SLUG, $css_file, array(), WP_COMMENTNAVI_VERSION );
 	}
 
 	/**
@@ -77,18 +77,18 @@ class CommentNavi_Core {
 		$wrapper_class = $args['wrapper_class'];
 		$echo          = $args['echo'];
 
-		$options = wp_parse_args( is_array( $args['options'] ) ? $args['options'] : array(), CommentNavi_Options::get() );
+		$options = wp_parse_args( is_array( $args['options'] ) ? $args['options'] : array(), WP_CommentNavi_Options::get() );
 
 		// The text options are output as HTML, so they are filtered here as well as
 		// on save, to cover values set through the 'options' argument or written to
 		// the option row directly by WP-CLI, a migration or another plugin.
-		foreach ( CommentNavi_Options::text_keys() as $key ) {
+		foreach ( WP_CommentNavi_Options::text_keys() as $key ) {
 			if ( isset( $options[ $key ] ) ) {
-				$options[ $key ] = CommentNavi_Options::kses( $options[ $key ] );
+				$options[ $key ] = WP_CommentNavi_Options::kses( $options[ $key ] );
 			}
 		}
 
-		$instance = new CommentNavi_Call( $args );
+		$instance = new WP_CommentNavi_Call( $args );
 
 		list( $paged, $total_pages ) = $instance->get_pagination_args();
 
@@ -176,18 +176,18 @@ class CommentNavi_Core {
 	/**
 	 * Render the numbered link style.
 	 *
-	 * @param CommentNavi_Call $instance             The current call.
-	 * @param array            $options              Merged options.
-	 * @param array            $class_names          Filtered class names.
-	 * @param int              $paged                Current page.
-	 * @param int              $total_pages          Total pages.
-	 * @param int              $start_page           First page in the window.
-	 * @param int              $end_page             Last page in the window.
-	 * @param int              $pages_to_show        Size of the window.
-	 * @param int              $half_page_start      Pages before the current one.
-	 * @param int              $half_page_end        Pages after the current one.
-	 * @param int              $larger_page_to_show  How many larger page numbers to show.
-	 * @param int              $larger_page_multiple Multiple the larger page numbers step by.
+	 * @param WP_CommentNavi_Call $instance             The current call.
+	 * @param array               $options              Merged options.
+	 * @param array               $class_names          Filtered class names.
+	 * @param int                 $paged                Current page.
+	 * @param int                 $total_pages          Total pages.
+	 * @param int                 $start_page           First page in the window.
+	 * @param int                 $end_page             Last page in the window.
+	 * @param int                 $pages_to_show        Size of the window.
+	 * @param int                 $half_page_start      Pages before the current one.
+	 * @param int                 $half_page_end        Pages after the current one.
+	 * @param int                 $larger_page_to_show  How many larger page numbers to show.
+	 * @param int                 $larger_page_multiple Multiple the larger page numbers step by.
 	 * @return string
 	 */
 	protected static function render_normal( $instance, $options, $class_names, $paged, $total_pages, $start_page, $end_page, $pages_to_show, $half_page_start, $half_page_end, $larger_page_to_show, $larger_page_multiple ) {
@@ -359,11 +359,11 @@ class CommentNavi_Core {
 	 * nothing to do with the front end and 404s for a logged-out visitor. Nothing
 	 * is ever submitted: the select navigates on change.
 	 *
-	 * @param CommentNavi_Call $instance    The current call.
-	 * @param array            $options     Merged options.
-	 * @param array            $class_names Filtered class names.
-	 * @param int              $paged       Current page.
-	 * @param int              $total_pages Total pages.
+	 * @param WP_CommentNavi_Call $instance    The current call.
+	 * @param array               $options     Merged options.
+	 * @param array               $class_names Filtered class names.
+	 * @param int                 $paged       Current page.
+	 * @param int                 $total_pages Total pages.
 	 * @return string
 	 */
 	protected static function render_dropdown( $instance, $options, $class_names, $paged, $total_pages ) {

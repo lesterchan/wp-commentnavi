@@ -37,58 +37,13 @@
 // Prevent direct access.
 defined( 'ABSPATH' ) || exit;
 
-// Plugin version.
 define( 'WP_COMMENTNAVI_VERSION', '2.0.0' );
-
-// Main plugin file, for resolving paths from the includes.
+define( 'WP_COMMENTNAVI_DB_VERSION', '1' );
+define( 'WP_COMMENTNAVI_SLUG', 'wp-commentnavi' );
 define( 'WP_COMMENTNAVI_MAIN_FILE', __FILE__ );
+define( 'WP_COMMENTNAVI_DIR', plugin_dir_path( __FILE__ ) );
+define( 'WP_COMMENTNAVI_URL', plugin_dir_url( __FILE__ ) );
 
-require_once __DIR__ . '/includes/class-commentnavi-options.php';
-require_once __DIR__ . '/includes/class-commentnavi-call.php';
-require_once __DIR__ . '/includes/class-commentnavi-core.php';
-require_once __DIR__ . '/includes/template-tags.php';
+require_once WP_COMMENTNAVI_DIR . 'includes/class-wp-commentnavi.php';
 
-CommentNavi_Core::init();
-
-if ( is_admin() ) {
-	require_once __DIR__ . '/includes/class-commentnavi-admin.php';
-	CommentNavi_Admin::init();
-}
-
-register_activation_hook( __FILE__, 'wp_commentnavi_activate' );
-
-/**
- * Seed the option row on activation.
- *
- * Calling add_option() leaves an existing row alone, and the options are merged
- * over the defaults on every read anyway, so this is a convenience rather than
- * a requirement — the plugin works correctly with no row at all.
- *
- * The network branch replaces a wp_get_sites() call that WordPress removed in
- * 5.1, which made network activation a fatal error. 'number' => 0 lifts
- * WP_Site_Query's default cap of 100, and restore_current_blog() runs inside
- * the loop because switch_to_blog() pushes onto a stack.
- *
- * @param bool $network_wide Whether the plugin is being activated network-wide.
- * @return void
- */
-function wp_commentnavi_activate( $network_wide = false ) {
-	if ( is_multisite() && $network_wide ) {
-		$site_ids = get_sites(
-			array(
-				'fields' => 'ids',
-				'number' => 0,
-			)
-		);
-
-		foreach ( $site_ids as $site_id ) {
-			switch_to_blog( (int) $site_id );
-			add_option( CommentNavi_Options::OPTION_NAME, CommentNavi_Options::get_defaults() );
-			restore_current_blog();
-		}
-
-		return;
-	}
-
-	add_option( CommentNavi_Options::OPTION_NAME, CommentNavi_Options::get_defaults() );
-}
+WP_CommentNavi::init();

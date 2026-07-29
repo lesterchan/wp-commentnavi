@@ -21,22 +21,14 @@ if ( ! file_exists( $_tests_dir . '/includes/functions.php' ) ) {
 require_once $_tests_dir . '/includes/functions.php';
 
 /**
- * Load the plugin, and its admin half, which the plugin itself only loads on
- * admin requests.
- *
- * The admin file is required conditionally because this bootstrap has to load
- * both the procedural plugin as it stood before 2.0.0 and the restructured one,
- * so that the same suite can be run against either.
+ * Load the plugin, and its settings screen, which the plugin itself only loads
+ * on admin requests.
  *
  * @return void
  */
 function _commentnavi_manually_load_plugin() {
 	require dirname( __DIR__ ) . '/wp-commentnavi.php';
-
-	$admin = dirname( __DIR__ ) . '/includes/class-commentnavi-admin.php';
-	if ( file_exists( $admin ) ) {
-		require_once $admin;
-	}
+	require_once dirname( __DIR__ ) . '/includes/class-wp-commentnavi-settings.php';
 }
 tests_add_filter( 'muplugins_loaded', '_commentnavi_manually_load_plugin' );
 
