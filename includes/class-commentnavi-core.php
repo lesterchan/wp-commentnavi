@@ -30,6 +30,9 @@ class CommentNavi_Core {
 	 * produced a URL with nothing behind it and a child-theme override was never
 	 * found at all. Each candidate is now tested and enqueued from the same place.
 	 *
+	 * The file the theme is asked for is named after the plugin slug, matching the
+	 * one the plugin now ships in css/. Before 2.0.0 both were 'commentnavi-css.css'.
+	 *
 	 * @return void
 	 */
 	public static function stylesheets() {
@@ -37,12 +40,12 @@ class CommentNavi_Core {
 			return;
 		}
 
-		if ( file_exists( get_stylesheet_directory() . '/commentnavi-css.css' ) ) {
-			$css_file = get_stylesheet_directory_uri() . '/commentnavi-css.css';
-		} elseif ( file_exists( get_template_directory() . '/commentnavi-css.css' ) ) {
-			$css_file = get_template_directory_uri() . '/commentnavi-css.css';
+		if ( file_exists( get_stylesheet_directory() . '/wp-commentnavi.css' ) ) {
+			$css_file = get_stylesheet_directory_uri() . '/wp-commentnavi.css';
+		} elseif ( file_exists( get_template_directory() . '/wp-commentnavi.css' ) ) {
+			$css_file = get_template_directory_uri() . '/wp-commentnavi.css';
 		} else {
-			$css_file = plugins_url( 'commentnavi-css.css', WP_COMMENTNAVI_MAIN_FILE );
+			$css_file = plugins_url( 'css/wp-commentnavi.css', WP_COMMENTNAVI_MAIN_FILE );
 		}
 
 		wp_enqueue_style( 'wp-commentnavi', $css_file, array(), WP_COMMENTNAVI_VERSION );

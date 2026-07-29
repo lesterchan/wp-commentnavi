@@ -175,9 +175,9 @@ class Test_CommentNavi_Features extends CommentNavi_TestCase {
 		$styles = wp_styles();
 		$src    = $styles->registered['wp-commentnavi']->src;
 
-		$this->assertStringContainsString( 'commentnavi-css.css', $src );
+		$this->assertStringContainsString( 'css/wp-commentnavi.css', $src );
 		$this->assertSame(
-			plugins_url( 'commentnavi-css.css', WP_COMMENTNAVI_MAIN_FILE ),
+			plugins_url( 'css/wp-commentnavi.css', WP_COMMENTNAVI_MAIN_FILE ),
 			$src
 		);
 	}

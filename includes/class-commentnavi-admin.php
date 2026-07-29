@@ -215,7 +215,7 @@ class CommentNavi_Admin {
 
 		return array(
 			'use_commentnavi_css'          => array(
-				'title'   => __( 'Use commentnavi-css.css', 'wp-commentnavi' ),
+				'title'   => __( 'Use wp-commentnavi.css', 'wp-commentnavi' ),
 				'type'    => 'radio',
 				'choices' => $yes_no,
 			),

@@ -3,7 +3,7 @@ Default style for the WP-CommentNavi plugin.
 
 Copy this file into your theme's directory to override it; your copy survives
 plugin updates, and a copy in a child theme wins over one in the parent. Or set
-"Use commentnavi-css.css" to No under Settings -> CommentNavi and put the styles
+"Use wp-commentnavi.css" to No under Settings -> CommentNavi and put the styles
 in your theme's own stylesheet.
 
 https://lesterchan.net/portfolio/programming/php/
