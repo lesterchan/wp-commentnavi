@@ -113,7 +113,7 @@ class WP_CommentNavi_Settings {
 	public static function add_page() {
 		add_options_page(
 			__( 'CommentNavi Settings', 'wp-commentnavi' ),
-			__( 'CommentNavi', 'wp-commentnavi' ),
+			__( 'WP-CommentNavi', 'wp-commentnavi' ),
 			self::capability(),
 			self::PAGE,
 			array( __CLASS__, 'render_page' )
