@@ -34,6 +34,22 @@ class WP_CommentNavi_TestCase extends WP_UnitTestCase {
 	public function set_up() {
 		parent::set_up();
 
+		/*
+		 * Put the template globals back.
+		 *
+		 * WP_UnitTestCase_Base::tear_down() sets $wp_stylesheet_path and
+		 * $wp_template_path to null on purpose, so a test that switched theme
+		 * cannot leak its template directory into the next one. On a real request
+		 * wp-settings.php populates both before any plugin runs, and nothing ever
+		 * clears them again. locate_template() re-derives them when they are
+		 * unset, but comments_template() reads $wp_stylesheet_path straight into
+		 * trailingslashit(), so under the harness alone it hands null to rtrim()
+		 * -- fatal here, because the shared phpunit.xml.dist turns deprecations
+		 * into exceptions. Restoring the invariant the harness broke is what makes
+		 * the integration tests exercise the same code path a browser does.
+		 */
+		wp_set_template_globals();
+
 		$this->post_id = self::factory()->post->create(
 			array(
 				'post_title'  => 'CommentNavi test post',
