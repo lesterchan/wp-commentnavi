@@ -192,7 +192,7 @@ Also check that *Break comments into pages* is enabled under *Settings -> Discus
 ## Upgrade Notice
 
 ### 2.0.0
-**This release requires WordPress 6.8 and PHP 8.2**, up from 6.0 and 7.4. If your site runs anything older it will stay on the version you have and simply not be offered the update — upgrade WordPress and PHP first.
+**This release requires WordPress 6.8 and PHP 8.2**. If your site runs anything older it will stay on the version you have and simply not be offered the update — upgrade WordPress and PHP first.
 
 **If your theme calls `wp_commentnavi_all_comments_link()`, your site will break.** That function is gone, along with the `comment-all` query variable behind it, because any visitor could append `?comment-all=1` to any URL and make WordPress load up to 9999 comments in one query. Open your theme's `comments.php` and delete the line that calls it. `wp_commentnavi()` and `wp_commentnavi_dropdown()` are unchanged and need no edit.
 
