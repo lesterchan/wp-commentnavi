@@ -25,8 +25,8 @@ function wp_commentnavi_uninstall_site() {
 if ( is_multisite() ) {
 	// Three separate bugs lived in this block before 2.0.0.
 	//
-	// wp_get_sites() was removed in WordPress 5.1, so multisite uninstall was a
-	// fatal error rather than a partial one.
+	// wp_get_sites() has been deprecated since WordPress 4.6 and returns only
+	// the first 100 sites, so multisite uninstall was silently partial.
 	//
 	// 'number' => 0 is required: WP_Site_Query defaults it to 100, so without it
 	// a network larger than that keeps the option on every site past the

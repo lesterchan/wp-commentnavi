@@ -46,8 +46,9 @@ class WP_CommentNavi {
 	 * merged over the defaults on every read, so this is about carrying an existing
 	 * install forward rather than about seeding a new one.
 	 *
-	 * The network branch replaces a wp_get_sites() call that WordPress removed in
-	 * 5.1, which made network activation a fatal error. 'number' => 0 lifts
+	 * The network branch replaces a wp_get_sites() call. That function has been
+	 * deprecated since WordPress 4.6 and returns only the first 100 sites, so
+	 * network activation silently skipped the rest. 'number' => 0 lifts
 	 * WP_Site_Query's default cap of 100, and restore_current_blog() runs inside
 	 * the loop because switch_to_blog() pushes onto a stack.
 	 *

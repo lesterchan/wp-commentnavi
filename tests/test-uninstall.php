@@ -54,17 +54,17 @@ class WP_CommentNavi_Uninstall_Test extends WP_CommentNavi_TestCase {
 		$this->assertFalse( get_option( WP_CommentNavi_Options::LEGACY_OPTION ) );
 	}
 
-	public function test_no_call_to_the_removed_wp_get_sites() {
-		// Calling it does not degrade gracefully -- it is a fatal error, so before
-		// 2.0.0 both network activation and multisite uninstall died outright on any
-		// supported WordPress. A single-site suite cannot reach that code path, so
-		// this is asserted against the source instead.
+	public function test_no_call_to_the_deprecated_wp_get_sites() {
+		// It does not fail loudly -- it is capped at 100 sites, so before 2.0.0 both
+		// network activation and multisite uninstall silently did nothing for every
+		// site past the hundredth and reported success. A single-site suite cannot
+		// reach that code path, so this is asserted against the source instead.
 
 		foreach ( $this->plugin_php_files() as $file ) {
 			$this->assertStringNotContainsString(
 				'wp_get_sites',
 				$this->code_without_comments( $file ),
-				basename( $file ) . ' calls wp_get_sites(), which WordPress removed in 5.1.'
+				basename( $file ) . ' calls wp_get_sites(), which is capped at 100 sites.'
 			);
 		}
 	}
