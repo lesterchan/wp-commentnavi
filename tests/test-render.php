@@ -120,8 +120,16 @@ class WP_CommentNavi_Render_Test extends WP_CommentNavi_TestCase {
 				continue;
 			}
 
-			$this->assertStringContainsString(
-				'cpage=' . $node['text'],
+			// Compared against core's own answer rather than a 'cpage=' substring.
+			// get_comments_pagenum_link() has two shapes — the query argument, and
+			// a pretty /comment-page-N/ suffix when a permalink structure is set —
+			// and which one it returns is core's business, not this plugin's. The
+			// multisite install has a permalink structure, so the substring form
+			// asserted something that was only ever true of a plain-permalink
+			// single site. This asserts the thing that is actually the plugin's
+			// contract: the link labelled N is the link core builds for page N.
+			$this->assertSame(
+				get_comments_pagenum_link( (int) $node['text'] ),
 				$node['href'],
 				"The link labelled {$node['text']} does not point at comment page {$node['text']}."
 			);

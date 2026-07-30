@@ -154,8 +154,15 @@ class WP_CommentNavi_Integration_Test extends WP_CommentNavi_TestCase {
 				continue;
 			}
 
-			$this->assertStringContainsString( 'cpage=' . $node['text'], $node['href'] );
-			$this->assertStringContainsString( (string) $post_id, $node['href'] );
+			// Compared against the link core itself builds, rather than against a
+			// query argument that only appears when permalinks are plain. The note
+			// in the render test explains why. This also proves the link belongs to
+			// this post, since core starts from that post's permalink.
+			$this->assertSame(
+				get_comments_pagenum_link( (int) $node['text'] ),
+				$node['href'],
+				"The link labelled {$node['text']} does not point at comment page {$node['text']} of this post."
+			);
 			++$found;
 		}
 
