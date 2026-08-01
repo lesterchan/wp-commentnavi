@@ -166,29 +166,6 @@ Also check that *Break comments into pages* is enabled under *Settings -> Discus
 * FIXED: The stylesheet is enqueued on `wp_enqueue_scripts` rather than `wp_print_styles`, and its version tracks the plugin version instead of being pinned to 1.10
 * NOTE: Four settings labels were renamed from "Text For First/Last/Next/Previous Comment" to "... Page", because those links go to a page of comments rather than to a comment. Renaming a string resets it on translate.wordpress.org, so those four labels will show in English in translated locales until someone retranslates them. Every other existing label kept its original wording precisely to avoid that
 
-### 1.12.2
-* FIXED: XSS. esc_attr() on form values
-
-### 1.12.1
-* FIXED: XSS
-
-### 1.12
-* FIXED: commentnavi_textdomain instead of polls_textdomain. Props slightlydifferent.
-
-### 1.11
-* NEW: Supports WordPress Mutisite Network Activation
-* NEW: Uses WordPress native uninstall.php
-
-### 1.10
-* NEW: Works For WordPress 2.8
-* NEW: Added "View All Comments" Link Function
-* NEW: Added "first", "page" and "last" CSS Name To Link
-* NEW: Use _n() Instead Of __ngettext() And _n_noop() Instead Of __ngettext_noop()
-* FIXED: Removed "&amp;#8201;" Entity
-
-### 1.00
-* NEW: Initial Release
-
 ## Upgrade Notice
 
 ### 2.0.0
