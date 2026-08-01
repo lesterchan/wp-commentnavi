@@ -139,7 +139,7 @@ Also check that *Break comments into pages* is enabled under *Settings -> Discus
 
 ## Changelog
 ### 2.0.0
-* BREAKING: Requires WordPress 6.8 and PHP 8.2, up from 6.0 and 7.4. A site on an older stack will simply not be offered the update
+* BREAKING: Requires WordPress 6.8 and PHP 8.2, up from 6.0 and 7.4.
 * BREAKING: The "View all comments" feature has been removed — the `comment-all` query variable and `wp_commentnavi_all_comments_link()`. It hooked `pre_get_posts` with no `is_main_query()` or `is_singular()` guard and forced `comments_per_page` to 9999, so any visitor could trigger an unbounded comment query on any URL. If your theme calls `wp_commentnavi_all_comments_link()` you must remove that call. See the FAQ
 * BREAKING: The settings page moved to *Settings -> CommentNavi* at `options-general.php?page=wp-commentnavi`. The old address embedded the plugin's directory name, which made the screen unreachable for anyone who had installed the plugin under a different one. Update your bookmarks
 * BREAKING: The settings are stored in `wp_commentnavi_options` instead of `commentnavi_options`, and the plugin and schema versions in a `wp_commentnavi_version` row of their own. Your settings are carried across automatically the first time wp-admin is loaded after updating
@@ -169,12 +169,13 @@ Also check that *Break comments into pages* is enabled under *Settings -> Discus
 ## Upgrade Notice
 
 ### 2.0.0
-**This release requires WordPress 6.8 and PHP 8.2**. If your site runs anything older it will stay on the version you have and simply not be offered the update — upgrade WordPress and PHP first.
 
-**If your theme calls `wp_commentnavi_all_comments_link()`, your site will break.** That function is gone, along with the `comment-all` query variable behind it, because any visitor could append `?comment-all=1` to any URL and make WordPress load up to 9999 comments in one query. Open your theme's `comments.php` and delete the line that calls it. `wp_commentnavi()` and `wp_commentnavi_dropdown()` are unchanged and need no edit.
+Requires WordPress 6.8 and PHP 8.2.
 
-**The settings screen has moved** to `options-general.php?page=wp-commentnavi`, still under *Settings -> CommentNavi*. The old address had the plugin's folder name inside it, so anyone who had installed the plugin under a different folder name could not open the screen at all. Update any bookmark you have.
+**If your theme calls `wp_commentnavi_all_comments_link()`, the site will fatal.** That function and the `comment-all` query variable behind it are gone: any visitor could append `?comment-all=1` to any URL and make WordPress load up to 9999 comments in one query. Delete the call from your theme's `comments.php`. `wp_commentnavi()` and `wp_commentnavi_dropdown()` are unchanged.
 
-**Your settings move to a new row in the database**, from `commentnavi_options` to `wp_commentnavi_options`, with the plugin and schema versions in a `wp_commentnavi_version` row of their own. This happens by itself the first time you load wp-admin after updating and there is nothing for you to do — but if you have a script, a WP-CLI command or a migration that writes `commentnavi_options` directly, point it at the new name.
+**The settings screen is at `options-general.php?page=wp-commentnavi`**, still under *Settings -> CommentNavi*. The old address embedded the plugin's folder name, so anyone who installed the plugin under a different folder name could not open the screen at all.
 
-**The navigation will look different.** The stylesheet no longer paints blue links, black borders and a white background over whatever your theme had chosen; it inherits your theme's colours instead, so it now fits a dark theme. To restyle it, set `--wp-commentnavi-border-color` and `--wp-commentnavi-border-color-current` in your theme's `style.css`. If you had copied `commentnavi-css.css` into your theme, rename your copy to `wp-commentnavi.css` — the plugin's own file is now `css/wp-commentnavi.css` and it looks for a theme copy under the matching name.
+**Settings migrate on the first admin page load**, from `commentnavi_options` to `wp_commentnavi_options`, with the plugin and schema versions in a `wp_commentnavi_version` row of their own. Point any script or WP-CLI command that writes `commentnavi_options` directly at the new name.
+
+**The navigation inherits your theme's colours** instead of painting blue links, black borders and a white background over them, so it now works on a dark theme. Set `--wp-commentnavi-border-color` and `--wp-commentnavi-border-color-current` to restyle it. If you copied `commentnavi-css.css` into your theme, rename your copy to `wp-commentnavi.css`; the plugin's own file is `css/wp-commentnavi.css` and the theme override is looked up under the matching name.
