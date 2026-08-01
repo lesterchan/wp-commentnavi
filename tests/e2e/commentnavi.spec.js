@@ -88,7 +88,7 @@ test.describe( 'WP-CommentNavi', () => {
 					author_name: `Commenter ${ i + 1 }`,
 					author_email: `commenter${ i + 1 }@example.com`,
 					status: 'approved',
-					date: new Date( Date.now() - ( COMMENTS - i ) * 60_000 )
+					date: new Date( Date.now() - ( ( COMMENTS - i ) * 60_000 ) )
 						.toISOString()
 						.slice( 0, 19 ),
 				},
@@ -146,7 +146,7 @@ test.describe( 'WP-CommentNavi', () => {
 		// Scoped to the list rather than the page: a sidebar widget showing
 		// recent comments would otherwise make this assertion about the theme.
 		await expect( comments.first() ).toContainText(
-			`Comment number ${ String( PER_PAGE + 1 ).padStart( 2, '0' ) }`
+			`Comment number ${ String( PER_PAGE + 1 ).padStart( 2, '0' ) }`,
 		);
 		await expect( page.locator( '.comment-list' ) ).not.toContainText( 'Comment number 01' );
 	} );
@@ -262,7 +262,7 @@ test.describe( 'The WP-CommentNavi settings screen', () => {
 		await admin.visitAdminPage( 'options-general.php' );
 
 		const entry = page.locator(
-			'#adminmenu a[href="options-general.php?page=wp-commentnavi"]'
+			'#adminmenu a[href="options-general.php?page=wp-commentnavi"]',
 		);
 		await expect( entry ).toHaveCount( 1 );
 
@@ -291,7 +291,7 @@ test.describe( 'The WP-CommentNavi settings screen', () => {
 		await page.goto( post.link );
 
 		await expect(
-			page.locator( 'link[rel="stylesheet"][href*="wp-commentnavi"]' )
+			page.locator( 'link[rel="stylesheet"][href*="wp-commentnavi"]' ),
 		).toHaveCount( 1 );
 
 		await admin.visitAdminPage( 'options-general.php', 'page=wp-commentnavi' );
@@ -303,7 +303,7 @@ test.describe( 'The WP-CommentNavi settings screen', () => {
 		await page.goto( post.link );
 
 		await expect(
-			page.locator( 'link[rel="stylesheet"][href*="wp-commentnavi"]' )
+			page.locator( 'link[rel="stylesheet"][href*="wp-commentnavi"]' ),
 		).toHaveCount( 0 );
 	} );
 
@@ -344,7 +344,7 @@ test.describe( 'The WP-CommentNavi settings screen', () => {
 		await other.goto( `${ baseURL }${ SETTINGS_URL }` );
 
 		await expect( other.locator( 'body' ) ).toContainText(
-			/do not have sufficient permissions|not allowed to access this page/
+			/do not have sufficient permissions|not allowed to access this page/,
 		);
 
 		await context.close();
