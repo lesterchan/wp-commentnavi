@@ -49,7 +49,9 @@ class WP_CommentNavi_Metadata_Test extends WP_CommentNavi_TestCase {
 	 * @return array
 	 */
 	protected function directories( $relative = '' ) {
-		$skip  = array( '.', '..', '.git', '.github', 'vendor', 'node_modules' );
+		// artifacts/ is a Playwright output directory: gitignored, never
+		// deployed, and recreated on any failing run.
+		$skip  = array( '.', '..', '.git', '.github', 'vendor', 'node_modules', 'artifacts' );
 		$found = array();
 
 		foreach ( (array) scandir( $this->plugin_path( $relative ) ) as $entry ) {
