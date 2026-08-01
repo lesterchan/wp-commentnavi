@@ -87,6 +87,31 @@ class WP_CommentNavi_TestCase extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Run the uninstaller, however many times a suite asks for it.
+	 *
+	 * The uninstaller declares a global function, so a second require would
+	 * fatal on redeclare and a require_once that has already fired proves
+	 * nothing. Calling the function directly once it exists is the repeatable
+	 * form. Nothing here touches schema, so including the file is safe for the
+	 * first caller.
+	 *
+	 * @return void
+	 */
+	protected function run_uninstall() {
+		if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
+			define( 'WP_UNINSTALL_PLUGIN', 'wp-commentnavi/wp-commentnavi.php' );
+		}
+
+		if ( function_exists( 'wp_commentnavi_uninstall_site' ) ) {
+			wp_commentnavi_uninstall_site();
+
+			return;
+		}
+
+		require $this->plugin_path( 'uninstall.php' );
+	}
+
+	/**
 	 * The option values the plugin has shipped with since 1.00.
 	 *
 	 * Written out in full because the procedural version of the plugin merged no
