@@ -88,6 +88,16 @@ test.describe( 'WP-CommentNavi', () => {
 					author_name: `Commenter ${ i + 1 }`,
 					author_email: `commenter${ i + 1 }@example.com`,
 					status: 'approved',
+
+					// A minute apart, and deliberately only that. The REST date
+					// field is read as site local time while toISOString()
+					// gives UTC, so on a machine in another timezone these
+					// land hours from where they read. Nothing here minds:
+					// every assertion in this file is about which page a
+					// comment is on, and that comes from the order, which a
+					// constant offset applied to all of them cannot change.
+					// Anything asserting on the date itself would need the
+					// site's own clock -- see wp-relativedate's siteNow().
 					date: new Date( Date.now() - ( ( COMMENTS - i ) * 60_000 ) )
 						.toISOString()
 						.slice( 0, 19 ),
@@ -336,6 +346,16 @@ test.describe( 'The WP-CommentNavi settings screen', () => {
 		const other = await context.newPage();
 
 		await other.goto( `${ baseURL }/wp-login.php` );
+
+		// wp-login.php focuses and selects #user_login on a 200ms timer, so
+		// that a visitor can start typing. Filling across that moment puts the
+		// password into the username box: Playwright focuses #user_pass, the
+		// timer takes focus back and selects what is there, and the typed text
+		// replaces the selection. Waiting for the timer's own effect is the
+		// signal that it has already fired -- a sleep would only make the race
+		// less likely.
+		await expect( other.locator( '#user_login' ) ).toBeFocused();
+
 		await other.locator( '#user_login' ).fill( username );
 		await other.locator( '#user_pass' ).fill( 'correct-horse-battery-staple' );
 		await other.locator( '#wp-submit' ).click();
