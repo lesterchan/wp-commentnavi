@@ -17,8 +17,15 @@ const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 const SETTINGS_URL = '/wp-admin/options-general.php?page=wp-commentnavi';
 
-const COMMENTS = 30;
-const PER_PAGE = 10;
+/**
+ * Five to a page, set by the fixture mu-plugin, matching the demo site.
+ *
+ * Twenty-five comments is five pages, which is also the default width of the
+ * plugin's window -- so every page number is on screen and a test can assert the
+ * whole set rather than a slice of it.
+ */
+const COMMENTS = 25;
+const PER_PAGE = 5;
 const PAGES = Math.ceil( COMMENTS / PER_PAGE );
 
 /** The post every test comments on, created once. */
@@ -138,7 +145,9 @@ test.describe( 'WP-CommentNavi', () => {
 		// The second ten, not the first ten again under a different heading.
 		// Scoped to the list rather than the page: a sidebar widget showing
 		// recent comments would otherwise make this assertion about the theme.
-		await expect( comments.first() ).toContainText( 'Comment number 11' );
+		await expect( comments.first() ).toContainText(
+			`Comment number ${ String( PER_PAGE + 1 ).padStart( 2, '0' ) }`
+		);
 		await expect( page.locator( '.comment-list' ) ).not.toContainText( 'Comment number 01' );
 	} );
 
@@ -154,7 +163,14 @@ test.describe( 'WP-CommentNavi', () => {
 		await nav( page ).locator( '.nextcommentslink' ).click();
 		await expect( nav( page ).locator( '.previouscommentslink' ) ).toHaveCount( 1 );
 
-		await nav( page ).locator( '.nextcommentslink' ).click();
+		// Walk to the end rather than clicking a fixed number of times: how many
+		// pages there are is a function of the fixture and the per-page setting,
+		// and a test that hardcodes two clicks quietly stops testing the last
+		// page the moment either changes.
+		for ( let i = 2; i < PAGES; i++ ) {
+			await nav( page ).locator( '.nextcommentslink' ).click();
+			await expect( nav( page ).locator( 'span.current' ) ).toHaveText( String( i + 1 ) );
+		}
 
 		await expect( nav( page ).locator( 'span.current' ) ).toHaveText( String( PAGES ) );
 		await expect( nav( page ).locator( '.nextcommentslink' ) ).toHaveCount( 0 );

@@ -83,7 +83,10 @@ function wp_commentnavi_e2e_comment_paging() {
 	add_filter(
 		'pre_option_comments_per_page',
 		static function () {
-			return '10';
+			// Five, matching the demo site's Settings -> Discussion. Smaller
+			// pages mean more of them for the same fixture, and the number of
+			// pages is the only thing this plugin is about.
+			return '5';
 		}
 	);
 
