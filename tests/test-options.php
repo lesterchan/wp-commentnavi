@@ -47,7 +47,7 @@ class WP_CommentNavi_Options_Test extends WP_CommentNavi_TestCase {
 		WP_CommentNavi_Options::maybe_upgrade();
 
 		$this->assertSame( 7, WP_CommentNavi_Options::get( 'num_pages' ) );
-		$this->assertFalse( get_option( WP_CommentNavi_Options::LEGACY_OPTION ) );
+		$this->assertFalse( get_option( WP_CommentNavi_Options::LEGACY_OPTION ), 'The legacy row is deleted once its contents have been folded in.' );
 	}
 
 	public function test_the_upgrade_is_idempotent() {
@@ -85,8 +85,8 @@ class WP_CommentNavi_Options_Test extends WP_CommentNavi_TestCase {
 			),
 			get_option( WP_CommentNavi_Options::VERSION )
 		);
-		$this->assertArrayNotHasKey( 'plugin', WP_CommentNavi_Options::get() );
-		$this->assertArrayNotHasKey( 'db', WP_CommentNavi_Options::get() );
+		$this->assertArrayNotHasKey( 'plugin', WP_CommentNavi_Options::get(), 'The plugin version marker lives in its own row, never in the settings array.' );
+		$this->assertArrayNotHasKey( 'db', WP_CommentNavi_Options::get(), 'The db version marker lives in its own row, never in the settings array.' );
 	}
 
 	public function test_version_markers_default_to_empty_strings() {
@@ -152,12 +152,12 @@ class WP_CommentNavi_Options_Test extends WP_CommentNavi_TestCase {
 		$this->assertSame( 9, $options['num_pages'] );
 		$this->assertSame( 2, $options['style'] );
 		$this->assertSame( WP_CommentNavi_Options::get_defaults()['page_text'], $options['page_text'] );
-		$this->assertArrayHasKey( 'use_commentnavi_css', $options );
+		$this->assertArrayHasKey( 'use_commentnavi_css', $options, 'A partial stored row is merged over the defaults rather than replacing them.' );
 	}
 
 	public function test_reading_a_single_key() {
 		$this->assertSame( 5, WP_CommentNavi_Options::get( 'num_pages' ) );
-		$this->assertNull( WP_CommentNavi_Options::get( 'no_such_key' ) );
+		$this->assertNull( WP_CommentNavi_Options::get( 'no_such_key' ), 'An unknown key reads back null rather than raising a notice.' );
 	}
 
 	public function test_non_array_row_falls_back_to_defaults() {

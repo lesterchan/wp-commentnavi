@@ -44,14 +44,14 @@ class WP_CommentNavi_Uninstall_Test extends WP_CommentNavi_TestCase {
 		WP_CommentNavi_Options::maybe_upgrade();
 		update_option( WP_CommentNavi_Options::LEGACY_OPTION, array( 'style' => 1 ) );
 
-		$this->assertIsArray( get_option( WP_CommentNavi_Options::OPTION ) );
-		$this->assertIsArray( get_option( WP_CommentNavi_Options::VERSION ) );
+		$this->assertIsArray( get_option( WP_CommentNavi_Options::OPTION ), 'The fixture really does have a settings row for uninstall to delete.' );
+		$this->assertIsArray( get_option( WP_CommentNavi_Options::VERSION ), 'The fixture really does have a version row for uninstall to delete.' );
 
 		wp_commentnavi_uninstall_site();
 
-		$this->assertFalse( get_option( WP_CommentNavi_Options::OPTION ) );
-		$this->assertFalse( get_option( WP_CommentNavi_Options::VERSION ) );
-		$this->assertFalse( get_option( WP_CommentNavi_Options::LEGACY_OPTION ) );
+		$this->assertFalse( get_option( WP_CommentNavi_Options::OPTION ), 'Uninstall deletes the settings row.' );
+		$this->assertFalse( get_option( WP_CommentNavi_Options::VERSION ), 'Uninstall deletes the version row.' );
+		$this->assertFalse( get_option( WP_CommentNavi_Options::LEGACY_OPTION ), 'Uninstall deletes the legacy row as well.' );
 	}
 
 	public function test_no_call_to_the_deprecated_wp_get_sites() {

@@ -201,6 +201,6 @@ class WP_CommentNavi_Integration_Test extends WP_CommentNavi_TestCase {
 
 		do_action( 'wp_enqueue_scripts' );
 
-		$this->assertTrue( wp_style_is( 'wp-commentnavi', 'enqueued' ) );
+		$this->assertTrue( wp_style_is( 'wp-commentnavi', 'enqueued' ), 'The stylesheet is enqueued on a real front-end request, not only when the enqueue is called directly.' );
 	}
 }

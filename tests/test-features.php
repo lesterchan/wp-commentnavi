@@ -119,14 +119,14 @@ class WP_CommentNavi_Features_Test extends WP_CommentNavi_TestCase {
 	public function test_stylesheet_toggle() {
 		$this->set_options( array( 'use_commentnavi_css' => 1 ) );
 		WP_CommentNavi_Core::stylesheets();
-		$this->assertTrue( wp_style_is( 'wp-commentnavi', 'enqueued' ) );
+		$this->assertTrue( wp_style_is( 'wp-commentnavi', 'enqueued' ), 'With the stylesheet setting on, the stylesheet is enqueued.' );
 
 		wp_dequeue_style( 'wp-commentnavi' );
 		wp_deregister_style( 'wp-commentnavi' );
 
 		$this->set_options( array( 'use_commentnavi_css' => 0 ) );
 		WP_CommentNavi_Core::stylesheets();
-		$this->assertFalse( wp_style_is( 'wp-commentnavi', 'enqueued' ) );
+		$this->assertFalse( wp_style_is( 'wp-commentnavi', 'enqueued' ), 'With the stylesheet setting off, nothing is enqueued.' );
 	}
 
 	public function test_stylesheet_url_is_not_hardcoded() {
@@ -165,7 +165,7 @@ class WP_CommentNavi_Features_Test extends WP_CommentNavi_TestCase {
 			)
 		);
 
-		$this->assertIsString( $markup );
+		$this->assertIsString( $markup, 'The array argument form returns markup rather than echoing it.' );
 		$this->assertStringContainsString( 'my-nav', $markup );
 		$this->assertStringStartsWith( '<nav', trim( $markup ) );
 	}
@@ -199,7 +199,7 @@ class WP_CommentNavi_Features_Test extends WP_CommentNavi_TestCase {
 		// tag is a breaking change for themes that call it, which is why it is pinned
 		// here rather than left to be quietly reintroduced.
 
-		$this->assertFalse( function_exists( 'wp_commentnavi_all_comments_link' ) );
+		$this->assertFalse( function_exists( 'wp_commentnavi_all_comments_link' ), 'The withdrawn all-comments helper is gone, not merely undocumented.' );
 
 		$this->go_to( add_query_arg( 'comment-all', 1, get_permalink( $this->post_id ) ) );
 

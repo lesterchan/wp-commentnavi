@@ -79,8 +79,8 @@ class WP_CommentNavi_Settings_Test extends WP_CommentNavi_TestCase {
 		);
 
 		$this->assertSame( 4, $clean['num_pages'] );
-		$this->assertArrayNotHasKey( 'evil_key', $clean );
-		$this->assertArrayNotHasKey( 'another_one', $clean );
+		$this->assertArrayNotHasKey( 'evil_key', $clean, 'A key the sanitiser does not know is discarded.' );
+		$this->assertArrayNotHasKey( 'another_one', $clean, 'Every unknown key is discarded, not only the first.' );
 	}
 
 	public function test_partial_submission_falls_back_to_the_defaults() {
@@ -140,10 +140,10 @@ class WP_CommentNavi_Settings_Test extends WP_CommentNavi_TestCase {
 		);
 
 		$style = $this->render_field( 'style' );
-		$this->assertMatchesRegularExpression( '/value="2"\s+selected/', $style );
+		$this->assertMatchesRegularExpression( '/value="2"\s+selected/', $style, 'The stored style is the option preselected in the dropdown.' );
 
 		$always = $this->render_field( 'always_show' );
-		$this->assertMatchesRegularExpression( '/value="1"\s+checked/', $always );
+		$this->assertMatchesRegularExpression( '/value="1"\s+checked/', $always, 'The stored always-show setting comes back checked.' );
 	}
 
 	public function test_text_field_escapes_its_value() {
@@ -203,7 +203,7 @@ class WP_CommentNavi_Settings_Test extends WP_CommentNavi_TestCase {
 	public function test_action_links() {
 		$links = WP_CommentNavi_Settings::action_links( array( '<a href="#">Deactivate</a>' ) );
 
-		$this->assertCount( 2, $links );
+		$this->assertCount( 2, $links, 'The Settings link is added to the one link that was passed in, not instead of it.' );
 		$this->assertStringContainsString( 'options-general.php?page=' . WP_COMMENTNAVI_SLUG, $links[0] );
 	}
 

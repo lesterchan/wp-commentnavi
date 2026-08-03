@@ -249,7 +249,7 @@ class WP_CommentNavi_Render_Test extends WP_CommentNavi_TestCase {
 
 		$html = $this->render( array( 'max_pages' => 10 ) );
 
-		$this->assertMatchesRegularExpression( '/class=[\'"]wp-commentnavi[\'"]/', $html );
+		$this->assertMatchesRegularExpression( '/class=[\'"]wp-commentnavi[\'"]/', $html, 'The wrapper keeps the documented wp-commentnavi class a theme may style.' );
 	}
 
 	public function test_before_and_after_wrap_the_output() {
