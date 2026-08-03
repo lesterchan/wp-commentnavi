@@ -11,9 +11,9 @@
 class WP_CommentNavi_Options_Test extends WP_CommentNavi_TestCase {
 
 	public function test_option_rows_carry_the_plugin_prefix() {
-		$this->assertSame( 'wp_commentnavi_options', WP_CommentNavi_Options::OPTION );
-		$this->assertSame( 'wp_commentnavi_version', WP_CommentNavi_Options::VERSION );
-		$this->assertSame( 'commentnavi_options', WP_CommentNavi_Options::LEGACY_OPTION );
+		$this->assertSame( 'wp_commentnavi_options', WP_CommentNavi_Options::OPTION, 'The settings row carries the plugin prefix.' );
+		$this->assertSame( 'wp_commentnavi_version', WP_CommentNavi_Options::VERSION, 'The version row carries it too.' );
+		$this->assertSame( 'commentnavi_options', WP_CommentNavi_Options::LEGACY_OPTION, 'The legacy row is named as it was released, which is what the migration reads.' );
 	}
 
 	public function test_the_upgrade_moves_the_legacy_row() {
@@ -46,7 +46,7 @@ class WP_CommentNavi_Options_Test extends WP_CommentNavi_TestCase {
 
 		WP_CommentNavi_Options::maybe_upgrade();
 
-		$this->assertSame( 7, WP_CommentNavi_Options::get( 'num_pages' ) );
+		$this->assertSame( 7, WP_CommentNavi_Options::get( 'num_pages' ), 'An existing new row wins; the upgrade does not overwrite what is already there.' );
 		$this->assertFalse( get_option( WP_CommentNavi_Options::LEGACY_OPTION ), 'The legacy row is deleted once its contents have been folded in.' );
 	}
 
@@ -58,7 +58,7 @@ class WP_CommentNavi_Options_Test extends WP_CommentNavi_TestCase {
 
 		WP_CommentNavi_Options::maybe_upgrade();
 
-		$this->assertSame( $first, WP_CommentNavi_Options::get() );
+		$this->assertSame( $first, WP_CommentNavi_Options::get(), 'Running the upgrade twice leaves the row as it was.' );
 	}
 
 	public function test_the_upgrade_resanitises_the_settings() {
@@ -72,7 +72,7 @@ class WP_CommentNavi_Options_Test extends WP_CommentNavi_TestCase {
 
 		WP_CommentNavi_Options::maybe_upgrade();
 
-		$this->assertStringNotContainsString( '<script', WP_CommentNavi_Options::get( 'pages_text' ) );
+		$this->assertStringNotContainsString( '<script', WP_CommentNavi_Options::get( 'pages_text' ), 'The upgrade re-sanitises, so a script stored by an older version does not survive.' );
 	}
 
 	public function test_the_upgrade_stamps_the_version_markers() {
@@ -83,7 +83,8 @@ class WP_CommentNavi_Options_Test extends WP_CommentNavi_TestCase {
 				'plugin' => WP_COMMENTNAVI_VERSION,
 				'db'     => WP_COMMENTNAVI_DB_VERSION,
 			),
-			get_option( WP_CommentNavi_Options::VERSION )
+			get_option( WP_CommentNavi_Options::VERSION ),
+			'The upgrade stamps both markers, which is what stops it running again.'
 		);
 		$this->assertArrayNotHasKey( 'plugin', WP_CommentNavi_Options::get(), 'The plugin version marker lives in its own row, never in the settings array.' );
 		$this->assertArrayNotHasKey( 'db', WP_CommentNavi_Options::get(), 'The db version marker lives in its own row, never in the settings array.' );
@@ -95,7 +96,8 @@ class WP_CommentNavi_Options_Test extends WP_CommentNavi_TestCase {
 				'plugin' => '',
 				'db'     => '',
 			),
-			WP_CommentNavi_Options::get_versions()
+			WP_CommentNavi_Options::get_versions(),
+			'With no row the markers read as empty strings rather than null.'
 		);
 	}
 
@@ -107,22 +109,23 @@ class WP_CommentNavi_Options_Test extends WP_CommentNavi_TestCase {
 				'plugin' => '',
 				'db'     => '',
 			),
-			WP_CommentNavi_Options::get_versions()
+			WP_CommentNavi_Options::get_versions(),
+			'A corrupt row reads as empty markers rather than propagating.'
 		);
 	}
 
 	public function test_defaults_when_nothing_stored() {
-		$this->assertSame( WP_CommentNavi_Options::get_defaults(), WP_CommentNavi_Options::get() );
+		$this->assertSame( WP_CommentNavi_Options::get_defaults(), WP_CommentNavi_Options::get(), 'With nothing stored the defaults are what is read.' );
 	}
 
 	public function test_default_values() {
 		$defaults = WP_CommentNavi_Options::get_defaults();
 
-		$this->assertSame( 5, $defaults['num_pages'] );
-		$this->assertSame( 1, $defaults['style'] );
-		$this->assertSame( 0, $defaults['always_show'] );
-		$this->assertSame( 1, $defaults['use_commentnavi_css'] );
-		$this->assertSame( '%PAGE_NUMBER%', $defaults['page_text'] );
+		$this->assertSame( 5, $defaults['num_pages'], 'Five pages is the shipped window.' );
+		$this->assertSame( 1, $defaults['style'], 'Style one, the numbered list, ships as the default.' );
+		$this->assertSame( 0, $defaults['always_show'], 'always_show ships off, so a single page renders nothing.' );
+		$this->assertSame( 1, $defaults['use_commentnavi_css'], 'The stylesheet ships on.' );
+		$this->assertSame( '%PAGE_NUMBER%', $defaults['page_text'], 'The page text ships as the bare token.' );
 	}
 
 	public function test_larger_page_numbers_are_off_by_default() {
@@ -132,7 +135,7 @@ class WP_CommentNavi_Options_Test extends WP_CommentNavi_TestCase {
 		// every site that upgrades -- a visible change nobody asked for. Pinned here
 		// so it cannot drift back by being copied from the sibling plugin.
 
-		$this->assertSame( 0, WP_CommentNavi_Options::get_defaults()['num_larger_page_numbers'] );
+		$this->assertSame( 0, WP_CommentNavi_Options::get_defaults()['num_larger_page_numbers'], 'The larger page numbers ship off.' );
 	}
 
 	public function test_partial_row_is_merged_over_the_defaults() {
@@ -149,21 +152,21 @@ class WP_CommentNavi_Options_Test extends WP_CommentNavi_TestCase {
 
 		$options = WP_CommentNavi_Options::get();
 
-		$this->assertSame( 9, $options['num_pages'] );
-		$this->assertSame( 2, $options['style'] );
-		$this->assertSame( WP_CommentNavi_Options::get_defaults()['page_text'], $options['page_text'] );
+		$this->assertSame( 9, $options['num_pages'], 'A stored key wins over its default.' );
+		$this->assertSame( 2, $options['style'], 'Every stored key wins, not only the first.' );
+		$this->assertSame( WP_CommentNavi_Options::get_defaults()['page_text'], $options['page_text'], 'A key absent from the stored row still takes its default.' );
 		$this->assertArrayHasKey( 'use_commentnavi_css', $options, 'A partial stored row is merged over the defaults rather than replacing them.' );
 	}
 
 	public function test_reading_a_single_key() {
-		$this->assertSame( 5, WP_CommentNavi_Options::get( 'num_pages' ) );
+		$this->assertSame( 5, WP_CommentNavi_Options::get( 'num_pages' ), 'A single key reads back its own value.' );
 		$this->assertNull( WP_CommentNavi_Options::get( 'no_such_key' ), 'An unknown key reads back null rather than raising a notice.' );
 	}
 
 	public function test_non_array_row_falls_back_to_defaults() {
 		update_option( WP_CommentNavi_Options::OPTION, 'not an array' );
 
-		$this->assertSame( WP_CommentNavi_Options::get_defaults(), WP_CommentNavi_Options::get() );
+		$this->assertSame( WP_CommentNavi_Options::get_defaults(), WP_CommentNavi_Options::get(), 'A row that is not an array falls back to the defaults rather than propagating.' );
 	}
 
 	public function test_kses_keeps_an_inline_svg() {
@@ -175,14 +178,14 @@ class WP_CommentNavi_Options_Test extends WP_CommentNavi_TestCase {
 
 		$filtered = WP_CommentNavi_Options::kses( $svg );
 
-		$this->assertStringContainsString( '<svg', $filtered );
-		$this->assertStringContainsString( '<path', $filtered );
-		$this->assertStringContainsString( 'd="M15 18l-6-6 6-6"', $filtered );
+		$this->assertStringContainsString( '<svg', $filtered, 'An inline SVG survives the filtering; the labels are allowed to carry icons.' );
+		$this->assertStringContainsString( '<path', $filtered, 'Its path child survives too.' );
+		$this->assertStringContainsString( 'd="M15 18l-6-6 6-6"', $filtered, 'And the path data, which is the whole point of keeping the element.' );
 	}
 
 	public function test_kses_strips_scripts_and_handlers() {
-		$this->assertStringNotContainsString( '<script', WP_CommentNavi_Options::kses( '<script>alert(1)</script>' ) );
-		$this->assertStringNotContainsString( 'onload', WP_CommentNavi_Options::kses( '<svg onload="alert(1)"></svg>' ) );
+		$this->assertStringNotContainsString( '<script', WP_CommentNavi_Options::kses( '<script>alert(1)</script>' ), 'A script element is stripped.' );
+		$this->assertStringNotContainsString( 'onload', WP_CommentNavi_Options::kses( '<svg onload="alert(1)"></svg>' ), 'An event handler on an allowed element is stripped too.' );
 	}
 
 	public function test_kses_filters_the_xlink_href_protocol() {
@@ -193,19 +196,19 @@ class WP_CommentNavi_Options_Test extends WP_CommentNavi_TestCase {
 
 		$filtered = WP_CommentNavi_Options::kses( '<svg><use xlink:href="javascript:alert(1)"></use></svg>' );
 
-		$this->assertStringNotContainsString( 'javascript:', $filtered );
+		$this->assertStringNotContainsString( 'javascript:', $filtered, 'A javascript: URI in xlink:href is filtered out.' );
 	}
 
 	public function test_kses_does_not_leave_the_uri_list_widened() {
 		WP_CommentNavi_Options::kses( '<svg></svg>' );
 
-		$this->assertNotContains( 'xlink:href', wp_kses_uri_attributes() );
+		$this->assertNotContains( 'xlink:href', wp_kses_uri_attributes(), 'The global URI attribute list is put back, so the widening does not outlive the call.' );
 	}
 
 	public function test_kses_rejects_a_non_scalar() {
 		// An array where a text option belongs yields an empty string rather than a
 		// PHP 8 array-to-string notice.
 
-		$this->assertSame( '', WP_CommentNavi_Options::kses( array( 'a', 'b' ) ) );
+		$this->assertSame( '', WP_CommentNavi_Options::kses( array( 'a', 'b' ) ), 'A non-scalar is answered with an empty string rather than Array.' );
 	}
 }

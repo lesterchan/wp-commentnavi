@@ -120,8 +120,8 @@ class WP_CommentNavi_Integration_Test extends WP_CommentNavi_TestCase {
 		global $wp_query;
 		$this->assertSame( 3, (int) $wp_query->max_num_comment_pages, 'Core did not paginate the thread as expected.' );
 
-		$this->assertSame( array( 1, 2, 3 ), $this->page_numbers( $html ) );
-		$this->assertSame( array( '1' ), $this->current_labels( $html ) );
+		$this->assertSame( array( 1, 2, 3 ), $this->page_numbers( $html ), 'A real comment thread pages the way the fixtures do.' );
+		$this->assertSame( array( '1' ), $this->current_labels( $html ), 'The first page is the one marked current.' );
 	}
 
 	public function test_second_page_of_a_real_thread() {
@@ -132,9 +132,9 @@ class WP_CommentNavi_Integration_Test extends WP_CommentNavi_TestCase {
 		$post_id = $this->post_with_comments( 25 );
 		$html    = $this->render_real( $post_id, 2 );
 
-		$this->assertSame( array( 1, 2, 3 ), $this->page_numbers( $html ) );
-		$this->assertSame( array( '2' ), $this->current_labels( $html ) );
-		$this->assertStringContainsString( 'Page 2 of 3', wp_strip_all_tags( $html ) );
+		$this->assertSame( array( 1, 2, 3 ), $this->page_numbers( $html ), 'The page list is the same whichever page is being viewed.' );
+		$this->assertSame( array( '2' ), $this->current_labels( $html ), 'The second page is the one marked current.' );
+		$this->assertStringContainsString( 'Page 2 of 3', wp_strip_all_tags( $html ), 'The label counts from the real thread rather than the fixture.' );
 	}
 
 	public function test_real_links_point_at_this_post() {
@@ -177,7 +177,7 @@ class WP_CommentNavi_Integration_Test extends WP_CommentNavi_TestCase {
 		$post_id = $this->post_with_comments( 3 );
 		$html    = $this->render_real( $post_id, 1 );
 
-		$this->assertSame( '', trim( $html ) );
+		$this->assertSame( '', trim( $html ), 'A thread that fits on one page renders nothing.' );
 	}
 
 	public function test_paging_disabled_renders_nothing() {
@@ -190,7 +190,7 @@ class WP_CommentNavi_Integration_Test extends WP_CommentNavi_TestCase {
 		$post_id = $this->post_with_comments( 25 );
 		$html    = $this->render_real( $post_id, 1 );
 
-		$this->assertSame( '', trim( $html ) );
+		$this->assertSame( '', trim( $html ), 'With comment paging switched off in core, nothing is rendered at all.' );
 	}
 
 	public function test_stylesheet_enqueued_on_a_real_request() {

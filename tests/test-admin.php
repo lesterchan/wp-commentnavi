@@ -46,9 +46,9 @@ class WP_CommentNavi_Settings_Test extends WP_CommentNavi_TestCase {
 		$left  = $this->render_field( 'dotleft_text' );
 		$right = $this->render_field( 'dotright_text' );
 
-		$this->assertStringContainsString( 'value="LEFTDOTS"', $left );
-		$this->assertStringNotContainsString( 'RIGHTDOTS', $left );
-		$this->assertStringContainsString( 'value="RIGHTDOTS"', $right );
+		$this->assertStringContainsString( 'value="LEFTDOTS"', $left, 'The dotleft field renders the dotleft value.' );
+		$this->assertStringNotContainsString( 'RIGHTDOTS', $left, 'It does not render the dotright value; the two fields were transposed once.' );
+		$this->assertStringContainsString( 'value="RIGHTDOTS"', $right, 'And the dotright field renders its own.' );
 	}
 
 	public function test_apostrophe_is_stored_as_typed() {
@@ -58,15 +58,15 @@ class WP_CommentNavi_Settings_Test extends WP_CommentNavi_TestCase {
 
 		$clean = WP_CommentNavi_Options::sanitize( array( 'first_text' => "O'Brien &laquo; First" ) );
 
-		$this->assertSame( "O'Brien &laquo; First", $clean['first_text'] );
-		$this->assertStringNotContainsString( '\\', $clean['first_text'] );
+		$this->assertSame( "O'Brien &laquo; First", $clean['first_text'], 'An apostrophe is stored as typed rather than escaped for SQL twice.' );
+		$this->assertStringNotContainsString( '\\', $clean['first_text'], 'No backslash survives, which is what a double escape would leave behind.' );
 	}
 
 	public function test_saving_twice_is_stable() {
 		$once  = WP_CommentNavi_Options::sanitize( array( 'prev_text' => "it's &laquo;" ) );
 		$twice = WP_CommentNavi_Options::sanitize( $once );
 
-		$this->assertSame( $once['prev_text'], $twice['prev_text'] );
+		$this->assertSame( $once['prev_text'], $twice['prev_text'], 'Saving twice leaves the value as it was; the sanitiser is idempotent.' );
 	}
 
 	public function test_unknown_keys_are_discarded() {
@@ -78,7 +78,7 @@ class WP_CommentNavi_Settings_Test extends WP_CommentNavi_TestCase {
 			)
 		);
 
-		$this->assertSame( 4, $clean['num_pages'] );
+		$this->assertSame( 4, $clean['num_pages'], 'A known key survives while the unknown ones are dropped.' );
 		$this->assertArrayNotHasKey( 'evil_key', $clean, 'A key the sanitiser does not know is discarded.' );
 		$this->assertArrayNotHasKey( 'another_one', $clean, 'Every unknown key is discarded, not only the first.' );
 	}
@@ -96,7 +96,7 @@ class WP_CommentNavi_Settings_Test extends WP_CommentNavi_TestCase {
 
 		$clean = WP_CommentNavi_Options::sanitize( array( 'style' => 2 ) );
 
-		$this->assertSame( 2, $clean['style'] );
+		$this->assertSame( 2, $clean['style'], 'The value is read from the posted form rather than the stored row.' );
 		$this->assertSame(
 			WP_CommentNavi_Options::get_defaults()['num_pages'],
 			$clean['num_pages'],
@@ -112,20 +112,20 @@ class WP_CommentNavi_Settings_Test extends WP_CommentNavi_TestCase {
 			)
 		);
 
-		$this->assertSame( 7, $clean['num_pages'] );
-		$this->assertSame( 3, $clean['num_larger_page_numbers'] );
+		$this->assertSame( 7, $clean['num_pages'], 'A numeric string is cast to an integer, not stored as text.' );
+		$this->assertSame( 3, $clean['num_larger_page_numbers'], 'Every integer setting is cast, not only the first.' );
 	}
 
 	public function test_scripts_are_stripped_on_save() {
 		$clean = WP_CommentNavi_Options::sanitize( array( 'pages_text' => 'Page <script>alert(1)</script>' ) );
 
-		$this->assertStringNotContainsString( '<script', $clean['pages_text'] );
+		$this->assertStringNotContainsString( '<script', $clean['pages_text'], 'A script is stripped from a text setting on the way in.' );
 	}
 
 	public function test_array_posted_into_a_text_setting() {
 		$clean = WP_CommentNavi_Options::sanitize( array( 'prev_text' => array( 'x' ) ) );
 
-		$this->assertSame( '', $clean['prev_text'] );
+		$this->assertSame( '', $clean['prev_text'], 'An array posted into a text setting becomes an empty string rather than Array.' );
 	}
 
 	public function test_current_values_are_preselected() {
@@ -163,21 +163,21 @@ class WP_CommentNavi_Settings_Test extends WP_CommentNavi_TestCase {
 		libxml_use_internal_errors( $use );
 
 		$xpath = new DOMXPath( $doc );
-		$this->assertSame( 0, $xpath->query( '//*[@onfocus]' )->length );
+		$this->assertSame( 0, $xpath->query( '//*[@onfocus]' )->length, 'The stored value is escaped in the field, so it cannot add an event handler.' );
 	}
 
 	public function test_page_slug_is_not_a_file_path() {
 		// The settings page is registered under Settings with a slug that does not
 		// contain the plugin's directory name.
 
-		$this->assertSame( WP_COMMENTNAVI_SLUG, WP_CommentNavi_Settings::PAGE );
-		$this->assertStringNotContainsString( '/', WP_CommentNavi_Settings::PAGE );
-		$this->assertStringNotContainsString( '.php', WP_CommentNavi_Settings::PAGE );
+		$this->assertSame( WP_COMMENTNAVI_SLUG, WP_CommentNavi_Settings::PAGE, 'The screen slug is the plugin slug.' );
+		$this->assertStringNotContainsString( '/', WP_CommentNavi_Settings::PAGE, 'It is not a path, which would let the screen be reached outside the menu.' );
+		$this->assertStringNotContainsString( '.php', WP_CommentNavi_Settings::PAGE, 'It is not a file name either.' );
 	}
 
 	public function test_capability_defaults_to_manage_options() {
-		$this->assertSame( 'manage_options', WP_CommentNavi_Settings::CAPABILITY );
-		$this->assertSame( 'manage_options', WP_CommentNavi_Settings::capability() );
+		$this->assertSame( 'manage_options', WP_CommentNavi_Settings::CAPABILITY, 'The capability constant is manage_options.' );
+		$this->assertSame( 'manage_options', WP_CommentNavi_Settings::capability(), 'And the accessor answers with it, so the two cannot drift.' );
 	}
 
 	public function test_capability_filter_is_honoured() {
@@ -196,7 +196,7 @@ class WP_CommentNavi_Settings_Test extends WP_CommentNavi_TestCase {
 
 		remove_filter( 'wp_commentnavi_capability', $replace, 10 );
 
-		$this->assertSame( 'edit_pages', $capability );
+		$this->assertSame( 'edit_pages', $capability, 'A filter can replace the capability the screen requires.' );
 		$this->assertSame( 'settings', $seen, 'the filter was not told which context it was being asked about.' );
 	}
 
@@ -204,7 +204,7 @@ class WP_CommentNavi_Settings_Test extends WP_CommentNavi_TestCase {
 		$links = WP_CommentNavi_Settings::action_links( array( '<a href="#">Deactivate</a>' ) );
 
 		$this->assertCount( 2, $links, 'The Settings link is added to the one link that was passed in, not instead of it.' );
-		$this->assertStringContainsString( 'options-general.php?page=' . WP_COMMENTNAVI_SLUG, $links[0] );
+		$this->assertStringContainsString( 'options-general.php?page=' . WP_COMMENTNAVI_SLUG, $links[0], 'The Settings link points at this plugin screen.' );
 	}
 
 	public function test_every_setting_has_a_registered_field() {
@@ -242,9 +242,9 @@ class WP_CommentNavi_Settings_Test extends WP_CommentNavi_TestCase {
 		// The section ids are prefixed with the plugin, and the display section is
 		// not spelled the same as the settings row.
 
-		$this->assertSame( 'wp_commentnavi_text', WP_CommentNavi_Settings::SECTION_TEXT );
-		$this->assertSame( 'wp_commentnavi_display', WP_CommentNavi_Settings::SECTION_DISPLAY );
-		$this->assertNotSame( WP_CommentNavi_Options::OPTION, WP_CommentNavi_Settings::SECTION_DISPLAY );
+		$this->assertSame( 'wp_commentnavi_text', WP_CommentNavi_Settings::SECTION_TEXT, 'The text section is prefixed, so no other plugin can claim it.' );
+		$this->assertSame( 'wp_commentnavi_display', WP_CommentNavi_Settings::SECTION_DISPLAY, 'The display section is prefixed too.' );
+		$this->assertNotSame( WP_CommentNavi_Options::OPTION, WP_CommentNavi_Settings::SECTION_DISPLAY, 'A section is not named after the option row; registering both there would collide.' );
 	}
 
 	public function test_fields_post_into_the_settings_array() {

@@ -107,7 +107,7 @@ class WP_CommentNavi_Security_Test extends WP_CommentNavi_TestCase {
 
 		$html = $this->render( array( 'max_pages' => 10 ) );
 
-		$this->assertStringNotContainsString( '<script', strtolower( $html ) );
+		$this->assertStringNotContainsString( '<script', strtolower( $html ), 'A script stored in an option is stripped on output as well as on save.' );
 	}
 
 	public function test_partial_option_row_renders_without_notices() {
@@ -130,7 +130,7 @@ class WP_CommentNavi_Security_Test extends WP_CommentNavi_TestCase {
 			)
 		);
 
-		$this->assertStringContainsString( 'Page 2 of 10', wp_strip_all_tags( $html ) );
+		$this->assertStringContainsString( 'Page 2 of 10', wp_strip_all_tags( $html ), 'A partial row renders, taking the defaults for what is missing.' );
 		$this->assertNotEmpty( $this->page_numbers( $html ), 'The page-number window collapsed when num_pages was absent.' );
 	}
 
@@ -144,7 +144,7 @@ class WP_CommentNavi_Security_Test extends WP_CommentNavi_TestCase {
 			)
 		);
 
-		$this->assertSame( array( 1, 2, 3, 4, 5 ), $this->page_numbers( $html ) );
+		$this->assertSame( array( 1, 2, 3, 4, 5 ), $this->page_numbers( $html ), 'A missing row falls back to the defaults rather than rendering nothing.' );
 	}
 
 	public function test_always_show_with_no_pages_reports_one_page() {
@@ -161,7 +161,7 @@ class WP_CommentNavi_Security_Test extends WP_CommentNavi_TestCase {
 			)
 		);
 
-		$this->assertStringContainsString( 'Page 1 of 1', wp_strip_all_tags( $html ) );
-		$this->assertStringNotContainsString( 'of 0', wp_strip_all_tags( $html ) );
+		$this->assertStringContainsString( 'Page 1 of 1', wp_strip_all_tags( $html ), 'With always_show and no pages, the label reports one page.' );
+		$this->assertStringNotContainsString( 'of 0', wp_strip_all_tags( $html ), 'It never reports zero, which would read as a broken thread.' );
 	}
 }

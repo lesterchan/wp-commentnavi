@@ -26,7 +26,7 @@ class WP_CommentNavi_Features_Test extends WP_CommentNavi_TestCase {
 			)
 		);
 
-		$this->assertSame( array( 1, 2, 3, 4, 5, 10, 20, 30 ), $this->page_numbers( $html ) );
+		$this->assertSame( array( 1, 2, 3, 4, 5, 10, 20, 30 ), $this->page_numbers( $html ), 'The larger numbers are appended after the window rather than inside it.' );
 	}
 
 	public function test_smaller_page_numbers_before_the_window() {
@@ -44,7 +44,7 @@ class WP_CommentNavi_Features_Test extends WP_CommentNavi_TestCase {
 			)
 		);
 
-		$this->assertSame( array( 10, 20, 30, 96, 97, 98, 99, 100 ), $this->page_numbers( $html ) );
+		$this->assertSame( array( 10, 20, 30, 96, 97, 98, 99, 100 ), $this->page_numbers( $html ), 'The smaller numbers are prepended before the window.' );
 	}
 
 	public function test_larger_page_numbers_absent_by_default() {
@@ -60,7 +60,7 @@ class WP_CommentNavi_Features_Test extends WP_CommentNavi_TestCase {
 			)
 		);
 
-		$this->assertSame( array( 1, 2, 3, 4, 5 ), $this->page_numbers( $html ) );
+		$this->assertSame( array( 1, 2, 3, 4, 5 ), $this->page_numbers( $html ), 'With the setting at zero only the window is drawn.' );
 	}
 
 	public function test_larger_page_numbers_multiple() {
@@ -78,7 +78,7 @@ class WP_CommentNavi_Features_Test extends WP_CommentNavi_TestCase {
 			)
 		);
 
-		$this->assertSame( array( 1, 2, 3, 4, 5, 25, 50 ), $this->page_numbers( $html ) );
+		$this->assertSame( array( 1, 2, 3, 4, 5, 25, 50 ), $this->page_numbers( $html ), 'The setting decides how many larger numbers are added.' );
 	}
 
 	public function test_class_name_filters() {
@@ -98,7 +98,7 @@ class WP_CommentNavi_Features_Test extends WP_CommentNavi_TestCase {
 
 		remove_filter( 'wp_commentnavi_class_current', $replace );
 
-		$this->assertStringContainsString( 'cn-custom-current', $html );
+		$this->assertStringContainsString( 'cn-custom-current', $html, 'A filter can replace the class the current page carries.' );
 	}
 
 	public function test_output_filter() {
@@ -113,7 +113,7 @@ class WP_CommentNavi_Features_Test extends WP_CommentNavi_TestCase {
 
 		remove_filter( 'wp_commentnavi', $replace );
 
-		$this->assertSame( 'REPLACED', trim( $html ) );
+		$this->assertSame( 'REPLACED', trim( $html ), 'The output filter replaces the markup entirely rather than being appended to.' );
 	}
 
 	public function test_stylesheet_toggle() {
@@ -139,8 +139,8 @@ class WP_CommentNavi_Features_Test extends WP_CommentNavi_TestCase {
 		$styles = wp_styles();
 		$src    = $styles->registered['wp-commentnavi']->src;
 
-		$this->assertStringContainsString( 'css/wp-commentnavi.css', $src );
-		$this->assertSame( WP_COMMENTNAVI_URL . 'css/wp-commentnavi.css', $src );
+		$this->assertStringContainsString( 'css/wp-commentnavi.css', $src, 'The stylesheet is registered from the plugin directory.' );
+		$this->assertSame( WP_COMMENTNAVI_URL . 'css/wp-commentnavi.css', $src, 'Its URL is built from the constant rather than hardcoded.' );
 	}
 
 	public function test_array_argument_form() {
@@ -166,8 +166,8 @@ class WP_CommentNavi_Features_Test extends WP_CommentNavi_TestCase {
 		);
 
 		$this->assertIsString( $markup, 'The array argument form returns markup rather than echoing it.' );
-		$this->assertStringContainsString( 'my-nav', $markup );
-		$this->assertStringStartsWith( '<nav', trim( $markup ) );
+		$this->assertStringContainsString( 'my-nav', $markup, 'The wrapper class argument reaches the markup.' );
+		$this->assertStringStartsWith( '<nav', trim( $markup ), 'The wrapper tag argument reaches it too.' );
 	}
 
 	public function test_per_call_option_override() {
@@ -188,8 +188,8 @@ class WP_CommentNavi_Features_Test extends WP_CommentNavi_TestCase {
 			)
 		);
 
-		$this->assertSame( array( 1, 2, 3 ), $this->page_numbers( $markup ) );
-		$this->assertSame( 5, WP_CommentNavi_Options::get( 'num_pages' ) );
+		$this->assertSame( array( 1, 2, 3 ), $this->page_numbers( $markup ), 'A per-call argument overrides the stored setting for that call.' );
+		$this->assertSame( 5, WP_CommentNavi_Options::get( 'num_pages' ), 'The stored setting is left as it was, so the override is not a write.' );
 	}
 
 	public function test_view_all_comments_feature_is_removed() {
@@ -203,7 +203,7 @@ class WP_CommentNavi_Features_Test extends WP_CommentNavi_TestCase {
 
 		$this->go_to( add_query_arg( 'comment-all', 1, get_permalink( $this->post_id ) ) );
 
-		$this->assertNotContains( 'comment-all', $GLOBALS['wp']->public_query_vars );
+		$this->assertNotContains( 'comment-all', $GLOBALS['wp']->public_query_vars, 'The withdrawn query variable is not registered; it would answer a public URL.' );
 	}
 
 	public function test_wrapper_tag_is_escaped() {
@@ -231,6 +231,6 @@ class WP_CommentNavi_Features_Test extends WP_CommentNavi_TestCase {
 		libxml_use_internal_errors( $use );
 
 		$xpath = new DOMXPath( $doc );
-		$this->assertSame( 0, $xpath->query( '//*[@onclick]' )->length );
+		$this->assertSame( 0, $xpath->query( '//*[@onclick]' )->length, 'The wrapper tag is escaped, so it cannot add an event handler.' );
 	}
 }

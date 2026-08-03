@@ -122,7 +122,7 @@ class WP_CommentNavi_Uninstall_Test extends WP_CommentNavi_TestCase {
 		$body = $this->foreach_body( dirname( __DIR__ ) . '/uninstall.php' );
 
 		$this->assertNotNull( $body, 'uninstall.php has no foreach loop over the network sites.' );
-		$this->assertStringContainsString( 'switch_to_blog', $body );
+		$this->assertStringContainsString( 'switch_to_blog', $body, 'The uninstaller switches per site, which is what the restore below is paired with.' );
 		$this->assertStringContainsString(
 			'restore_current_blog',
 			$body,
