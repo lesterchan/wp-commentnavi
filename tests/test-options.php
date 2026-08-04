@@ -35,6 +35,53 @@ class WP_CommentNavi_Options_Test extends WP_CommentNavi_TestCase {
 		$this->assertSame( 2, WP_CommentNavi_Options::get( 'style' ), 'the legacy settings were not carried over.' );
 	}
 
+	/**
+	 * A stock legacy row still lands, even once a `default` is registered.
+	 *
+	 * This plugin passes no `default` to `register_setting()` today, so the
+	 * §7.6.1 trap is not armed and a fixture equal to the defaults would prove
+	 * nothing on its own -- with no `default_option_wp_commentnavi_options` filter,
+	 * an absent row reads back as false and any write lands.
+	 *
+	 * write() is nonetheless written as though the filter existed, precisely so
+	 * that adding one later cannot quietly break the migration. That claim is
+	 * what this pins: the setting is registered here WITH a default, which is
+	 * the change a future release makes without thinking about migrations, and
+	 * the fold-in still has to land. Take write()'s add_option() branch away and
+	 * this goes red while every other test in the file stays green.
+	 *
+	 * The legacy row is seeded equal to the shipped defaults on purpose. A
+	 * customised one cannot see this at all, because a result differing from the
+	 * defaults is written whatever the read before it did.
+	 *
+	 * @return void
+	 */
+	public function test_a_stock_legacy_row_lands_even_with_a_registered_default() {
+		delete_option( WP_CommentNavi_Options::OPTION );
+		delete_option( WP_CommentNavi_Options::VERSION );
+
+		register_setting(
+			WP_CommentNavi_Settings::GROUP,
+			WP_CommentNavi_Options::OPTION,
+			array(
+				'type'              => 'array',
+				'sanitize_callback' => array( 'WP_CommentNavi_Options', 'sanitize' ),
+				'default'           => WP_CommentNavi_Options::get_defaults(),
+			)
+		);
+
+		update_option( WP_CommentNavi_Options::LEGACY_OPTION, WP_CommentNavi_Options::get_defaults() );
+
+		$this->assertFalse( get_option( WP_CommentNavi_Options::OPTION, false ), 'The fixture is only pre-migration if the new row is genuinely absent.' );
+
+		WP_CommentNavi_Options::maybe_upgrade();
+
+		$this->assertIsArray( get_option( WP_CommentNavi_Options::OPTION, false ), 'The migration must write the row even when its result equals the shipped defaults and a default is registered.' );
+		$this->assertFalse( get_option( WP_CommentNavi_Options::LEGACY_OPTION, false ), 'And the legacy row is deleted, having actually been folded in.' );
+
+		unregister_setting( WP_CommentNavi_Settings::GROUP, WP_CommentNavi_Options::OPTION );
+	}
+
 	public function test_the_upgrade_does_not_overwrite_the_new_row() {
 		// A settings row already in the new name is never overwritten by a stale
 		// legacy row that was left behind.
