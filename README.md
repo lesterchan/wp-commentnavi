@@ -134,8 +134,8 @@ Also check that *Break comments into pages* is enabled under *Settings -> Discus
 
 ## Screenshots
 
-1. Admin - CommentNavi Options
-2. Default CommentNavi Style
+1. Settings -> WP-CommentNavi, where every piece of the navigation text is set
+2. The comment links under a post with twenty pages of comments
 
 ## Changelog
 ### 2.0.0
