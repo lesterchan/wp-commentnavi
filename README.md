@@ -33,11 +33,15 @@ The plugin icon is by [Freepik](https://www.freepik.com) from [Flaticon](https:/
 ### Donations
 I spent most of my free time creating, updating, maintaining and supporting these plugins, if you really love my plugins and could spare me a couple of bucks, I will really appreciate it. If not feel free to use it without any obligations.
 
-## Usage
+## Installation
 
-1. Open `wp-content/themes/<YOUR THEME NAME>/comments.php`
-2. Add: `<?php if ( function_exists( 'wp_commentnavi' ) ) { wp_commentnavi(); } ?>`
-3. Go to *WP-Admin -> Settings -> CommentNavi* to configure it
+1. Install and activate the plugin.
+1. Open `wp-content/themes/<YOUR THEME NAME>/comments.php` and add `<?php if ( function_exists( 'wp_commentnavi' ) ) { wp_commentnavi(); } ?>` where the old comment links were.
+1. Go to `WP-Admin -> Settings -> CommentNavi` to configure it.
+
+The tag reads figures WordPress only populates inside `comments_template()`, so it belongs in `comments.php` and nowhere else.
+
+## Usage
 
 The template tag reads figures that WordPress only populates inside `comments_template()`, so it belongs in `comments.php` and produces nothing anywhere else.
 
