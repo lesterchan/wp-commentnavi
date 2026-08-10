@@ -143,7 +143,7 @@ Also check that *Break comments into pages* is enabled under *Settings -> Discus
 
 ## Changelog
 ### 2.0.0
-* BREAKING: Requires WordPress 6.8 and PHP 8.2, up from 6.0 and 7.4.
+* BREAKING: Requires WordPress 6.8 and PHP 8.2.
 * BREAKING: The "View all comments" feature has been removed — the `comment-all` query variable and `wp_commentnavi_all_comments_link()`. It hooked `pre_get_posts` with no `is_main_query()` or `is_singular()` guard and forced `comments_per_page` to 9999, so any visitor could trigger an unbounded comment query on any URL. If your theme calls `wp_commentnavi_all_comments_link()` you must remove that call. See the FAQ
 * BREAKING: The settings page moved to *Settings -> CommentNavi* at `options-general.php?page=wp-commentnavi`. The old address embedded the plugin's directory name, which made the screen unreachable for anyone who had installed the plugin under a different one. Update your bookmarks
 * BREAKING: The settings are stored in `wp_commentnavi_options` instead of `commentnavi_options`, and the plugin and schema versions in a `wp_commentnavi_version` row of their own. Your settings are carried across automatically the first time wp-admin is loaded after updating
