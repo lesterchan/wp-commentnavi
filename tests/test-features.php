@@ -143,6 +143,71 @@ class WP_CommentNavi_Features_Test extends WP_CommentNavi_TestCase {
 		$this->assertSame( WP_COMMENTNAVI_URL . 'css/wp-commentnavi.css', $src, 'Its URL is built from the constant rather than hardcoded.' );
 	}
 
+	public function test_theme_copy_overrides_the_plugin_stylesheet() {
+		// A copy named wp-commentnavi.css in the active theme wins over the
+		// plugin's own, which is the documented way to restyle the navigation
+		// without losing the changes on upgrade.
+
+		$GLOBALS['wp_styles'] = new WP_Styles();
+		$this->set_options( array( 'use_commentnavi_css' => 1 ) );
+
+		add_filter( 'stylesheet_directory', array( $this, 'filter_css_directory' ) );
+		add_filter(
+			'stylesheet_directory_uri',
+			static function () {
+				return 'https://example.org/theme';
+			}
+		);
+
+		WP_CommentNavi_Core::stylesheets();
+		$src = wp_styles()->registered['wp-commentnavi']->src;
+
+		$this->assertSame( 'https://example.org/theme/wp-commentnavi.css', $src, 'A copy in the theme overrides the plugin stylesheet.' );
+	}
+
+	public function test_parent_theme_copy_is_used_as_a_fallback() {
+		// Before 2.0.0 the lookup checked the parent theme but enqueued from the
+		// child theme's URL, so this exact case produced a URL with nothing
+		// behind it.
+
+		$GLOBALS['wp_styles'] = new WP_Styles();
+		$this->set_options( array( 'use_commentnavi_css' => 1 ) );
+
+		// The child theme deliberately has no copy.
+		add_filter(
+			'stylesheet_directory',
+			static function () {
+				return '/nonexistent-child-theme';
+			}
+		);
+		add_filter( 'template_directory', array( $this, 'filter_css_directory' ) );
+		add_filter(
+			'template_directory_uri',
+			static function () {
+				return 'https://example.org/parent';
+			}
+		);
+
+		WP_CommentNavi_Core::stylesheets();
+		$src = wp_styles()->registered['wp-commentnavi']->src;
+
+		$this->assertSame( 'https://example.org/parent/wp-commentnavi.css', $src, 'And a copy in the parent theme is used when the child has none.' );
+	}
+
+	/**
+	 * Point a theme directory at the plugin's own css/ folder.
+	 *
+	 * The lookup only asks whether wp-commentnavi.css exists in the directory,
+	 * and css/ is a directory that certainly holds one. Standing a real theme up
+	 * in the temp directory would mean creating and deleting files from a test,
+	 * and a half-run test would then leave them behind.
+	 *
+	 * @return string
+	 */
+	public function filter_css_directory() {
+		return untrailingslashit( dirname( __DIR__ ) . '/css' );
+	}
+
 	public function test_array_argument_form() {
 		// The template tag accepts an array of arguments as well as the positional
 		// form every previous release used.

@@ -258,4 +258,24 @@ class WP_CommentNavi_Options_Test extends WP_CommentNavi_TestCase {
 
 		$this->assertSame( '', WP_CommentNavi_Options::kses( array( 'a', 'b' ) ), 'A non-scalar is answered with an empty string rather than Array.' );
 	}
+
+	public function test_allowed_html_is_filterable() {
+		// The allow-list goes through one filter, so a site can narrow or widen
+		// it rather than having SVG forced on it.
+
+		$svg = '<svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>';
+
+		$this->assertArrayHasKey( 'svg', WP_CommentNavi_Options::allowed_html(), 'A filter can add svg to the allowed elements.' );
+
+		add_filter(
+			'wp_commentnavi_allowed_html',
+			static function ( $allowed ) {
+				unset( $allowed['svg'] );
+				return $allowed;
+			}
+		);
+
+		$this->assertArrayNotHasKey( 'svg', WP_CommentNavi_Options::allowed_html(), 'Removing the filter takes svg back out again.' );
+		$this->assertStringNotContainsString( '<svg', WP_CommentNavi_Options::kses( $svg ), 'A filter can narrow the allowed elements, so SVG is not forced on a site.' );
+	}
 }
