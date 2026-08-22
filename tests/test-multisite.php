@@ -9,7 +9,7 @@
  * pre-2.0.0 row, unread. The activation loop that prevents this has been here
  * since the rewrite and was never covered; these tests are what stop it being
  * simplified away, because nothing about a missing loop is visible on a single
- * site and every subsite heals the moment somebody opens its dashboard.
+ * site and every subsite heals the moment anything loads it.
  *
  * @package WP-CommentNavi
  */
