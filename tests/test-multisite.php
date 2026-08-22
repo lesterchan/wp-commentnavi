@@ -93,7 +93,7 @@ class WP_CommentNavi_Multisite_Test extends WP_CommentNavi_TestCase {
 
 			$this->assertSame(
 				WP_COMMENTNAVI_VERSION,
-				WP_CommentNavi_Options::get_versions()['plugin'],
+				WP_CommentNavi_Options::markers()['plugin'],
 				"Site {$site_id} was never stamped with the running version."
 			);
 

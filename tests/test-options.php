@@ -66,11 +66,11 @@ class WP_CommentNavi_Options_Test extends WP_CommentNavi_TestCase {
 			array(
 				'type'              => 'array',
 				'sanitize_callback' => array( 'WP_CommentNavi_Options', 'sanitize' ),
-				'default'           => WP_CommentNavi_Options::get_defaults(),
+				'default'           => WP_CommentNavi_Options::defaults(),
 			)
 		);
 
-		update_option( WP_CommentNavi_Options::LEGACY_OPTION, WP_CommentNavi_Options::get_defaults() );
+		update_option( WP_CommentNavi_Options::LEGACY_OPTION, WP_CommentNavi_Options::defaults() );
 
 		$this->assertFalse( get_option( WP_CommentNavi_Options::OPTION, false ), 'The fixture is only pre-migration if the new row is genuinely absent.' );
 
@@ -87,7 +87,7 @@ class WP_CommentNavi_Options_Test extends WP_CommentNavi_TestCase {
 		// legacy row that was left behind.
 
 		WP_CommentNavi_Options::update(
-			array_merge( WP_CommentNavi_Options::get_defaults(), array( 'num_pages' => 7 ) )
+			array_merge( WP_CommentNavi_Options::defaults(), array( 'num_pages' => 7 ) )
 		);
 		update_option( WP_CommentNavi_Options::LEGACY_OPTION, array( 'num_pages' => 9 ) );
 
@@ -143,7 +143,7 @@ class WP_CommentNavi_Options_Test extends WP_CommentNavi_TestCase {
 				'plugin' => '',
 				'db'     => '',
 			),
-			WP_CommentNavi_Options::get_versions(),
+			WP_CommentNavi_Options::markers(),
 			'With no row the markers read as empty strings rather than null.'
 		);
 	}
@@ -156,17 +156,17 @@ class WP_CommentNavi_Options_Test extends WP_CommentNavi_TestCase {
 				'plugin' => '',
 				'db'     => '',
 			),
-			WP_CommentNavi_Options::get_versions(),
+			WP_CommentNavi_Options::markers(),
 			'A corrupt row reads as empty markers rather than propagating.'
 		);
 	}
 
 	public function test_defaults_when_nothing_stored() {
-		$this->assertSame( WP_CommentNavi_Options::get_defaults(), WP_CommentNavi_Options::get(), 'With nothing stored the defaults are what is read.' );
+		$this->assertSame( WP_CommentNavi_Options::defaults(), WP_CommentNavi_Options::get(), 'With nothing stored the defaults are what is read.' );
 	}
 
 	public function test_default_values() {
-		$defaults = WP_CommentNavi_Options::get_defaults();
+		$defaults = WP_CommentNavi_Options::defaults();
 
 		$this->assertSame( 5, $defaults['num_pages'], 'Five pages is the shipped window.' );
 		$this->assertSame( 1, $defaults['style'], 'Style one, the numbered list, ships as the default.' );
@@ -182,7 +182,7 @@ class WP_CommentNavi_Options_Test extends WP_CommentNavi_TestCase {
 		// every site that upgrades -- a visible change nobody asked for. Pinned here
 		// so it cannot drift back by being copied from the sibling plugin.
 
-		$this->assertSame( 0, WP_CommentNavi_Options::get_defaults()['num_larger_page_numbers'], 'The larger page numbers ship off.' );
+		$this->assertSame( 0, WP_CommentNavi_Options::defaults()['num_larger_page_numbers'], 'The larger page numbers ship off.' );
 	}
 
 	public function test_partial_row_is_merged_over_the_defaults() {
@@ -201,7 +201,7 @@ class WP_CommentNavi_Options_Test extends WP_CommentNavi_TestCase {
 
 		$this->assertSame( 9, $options['num_pages'], 'A stored key wins over its default.' );
 		$this->assertSame( 2, $options['style'], 'Every stored key wins, not only the first.' );
-		$this->assertSame( WP_CommentNavi_Options::get_defaults()['page_text'], $options['page_text'], 'A key absent from the stored row still takes its default.' );
+		$this->assertSame( WP_CommentNavi_Options::defaults()['page_text'], $options['page_text'], 'A key absent from the stored row still takes its default.' );
 		$this->assertArrayHasKey( 'use_commentnavi_css', $options, 'A partial stored row is merged over the defaults rather than replacing them.' );
 	}
 
@@ -213,7 +213,7 @@ class WP_CommentNavi_Options_Test extends WP_CommentNavi_TestCase {
 	public function test_non_array_row_falls_back_to_defaults() {
 		update_option( WP_CommentNavi_Options::OPTION, 'not an array' );
 
-		$this->assertSame( WP_CommentNavi_Options::get_defaults(), WP_CommentNavi_Options::get(), 'A row that is not an array falls back to the defaults rather than propagating.' );
+		$this->assertSame( WP_CommentNavi_Options::defaults(), WP_CommentNavi_Options::get(), 'A row that is not an array falls back to the defaults rather than propagating.' );
 	}
 
 	public function test_kses_keeps_an_inline_svg() {

@@ -65,7 +65,7 @@ class WP_CommentNavi_Metadata_Test extends Plugin_Metadata_TestCase {
 	 * @return void
 	 */
 	protected function seed_option_rows() {
-		WP_CommentNavi_Options::update( WP_CommentNavi_Options::get_defaults() );
+		WP_CommentNavi_Options::update( WP_CommentNavi_Options::defaults() );
 		WP_CommentNavi_Options::maybe_upgrade();
 		update_option( WP_CommentNavi_Options::LEGACY_OPTION, array( 'style' => 1 ) );
 	}
@@ -111,9 +111,9 @@ class WP_CommentNavi_Metadata_Test extends Plugin_Metadata_TestCase {
 	 * @return void
 	 */
 	protected function register_plugin_assets() {
-		WP_CommentNavi_Options::update( WP_CommentNavi_Options::get_defaults() );
+		WP_CommentNavi_Options::update( WP_CommentNavi_Options::defaults() );
 
-		WP_CommentNavi_Core::stylesheets();
+		WP_CommentNavi_Core::enqueue_styles();
 	}
 
 	/**

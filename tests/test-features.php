@@ -118,14 +118,14 @@ class WP_CommentNavi_Features_Test extends WP_CommentNavi_TestCase {
 
 	public function test_stylesheet_toggle() {
 		$this->set_options( array( 'use_commentnavi_css' => 1 ) );
-		WP_CommentNavi_Core::stylesheets();
+		WP_CommentNavi_Core::enqueue_styles();
 		$this->assertTrue( wp_style_is( 'wp-commentnavi', 'enqueued' ), 'With the stylesheet setting on, the stylesheet is enqueued.' );
 
 		wp_dequeue_style( 'wp-commentnavi' );
 		wp_deregister_style( 'wp-commentnavi' );
 
 		$this->set_options( array( 'use_commentnavi_css' => 0 ) );
-		WP_CommentNavi_Core::stylesheets();
+		WP_CommentNavi_Core::enqueue_styles();
 		$this->assertFalse( wp_style_is( 'wp-commentnavi', 'enqueued' ), 'With the stylesheet setting off, nothing is enqueued.' );
 	}
 
@@ -134,7 +134,7 @@ class WP_CommentNavi_Features_Test extends WP_CommentNavi_TestCase {
 		// directory name, so the plugin works under any directory name.
 
 		$this->set_options( array( 'use_commentnavi_css' => 1 ) );
-		WP_CommentNavi_Core::stylesheets();
+		WP_CommentNavi_Core::enqueue_styles();
 
 		$styles = wp_styles();
 		$src    = $styles->registered['wp-commentnavi']->src;
@@ -159,7 +159,7 @@ class WP_CommentNavi_Features_Test extends WP_CommentNavi_TestCase {
 			}
 		);
 
-		WP_CommentNavi_Core::stylesheets();
+		WP_CommentNavi_Core::enqueue_styles();
 		$src = wp_styles()->registered['wp-commentnavi']->src;
 
 		$this->assertSame( 'https://example.org/theme/wp-commentnavi.css', $src, 'A copy in the theme overrides the plugin stylesheet.' );
@@ -188,7 +188,7 @@ class WP_CommentNavi_Features_Test extends WP_CommentNavi_TestCase {
 			}
 		);
 
-		WP_CommentNavi_Core::stylesheets();
+		WP_CommentNavi_Core::enqueue_styles();
 		$src = wp_styles()->registered['wp-commentnavi']->src;
 
 		$this->assertSame( 'https://example.org/parent/wp-commentnavi.css', $src, 'And a copy in the parent theme is used when the child has none.' );

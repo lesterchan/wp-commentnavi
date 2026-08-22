@@ -74,7 +74,7 @@ class WP_CommentNavi_Settings {
 	 */
 	public static function init() {
 		add_action( 'admin_menu', array( __CLASS__, 'add_page' ) );
-		add_action( 'admin_init', array( __CLASS__, 'register_settings' ) );
+		add_action( 'admin_init', array( __CLASS__, 'register' ) );
 
 		// Activation hooks do not fire when a plugin is updated, so the upgrade
 		// routine is also run on every admin load.
@@ -144,7 +144,7 @@ class WP_CommentNavi_Settings {
 	 *
 	 * @return void
 	 */
-	public static function register_settings() {
+	public static function register() {
 		register_setting(
 			self::GROUP,
 			WP_CommentNavi_Options::OPTION,

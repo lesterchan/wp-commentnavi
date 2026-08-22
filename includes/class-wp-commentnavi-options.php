@@ -266,7 +266,7 @@ class WP_CommentNavi_Options {
 	 *
 	 * @return array
 	 */
-	public static function get_defaults() {
+	public static function defaults() {
 		return array(
 			'pages_text'                   => __( 'Page %CURRENT_PAGE% of %TOTAL_PAGES%', 'wp-commentnavi' ),
 			'current_text'                 => '%PAGE_NUMBER%',
@@ -306,7 +306,7 @@ class WP_CommentNavi_Options {
 	 */
 	public static function get( $key = null ) {
 		$stored  = get_option( self::OPTION, array() );
-		$options = wp_parse_args( is_array( $stored ) ? $stored : array(), self::get_defaults() );
+		$options = wp_parse_args( is_array( $stored ) ? $stored : array(), self::defaults() );
 
 		if ( null === $key ) {
 			return $options;
@@ -330,7 +330,7 @@ class WP_CommentNavi_Options {
 	 *
 	 * @return array The 'plugin' and 'db' markers, each an empty string when unset.
 	 */
-	public static function get_versions() {
+	public static function markers() {
 		$stored = get_option( self::VERSION, array() );
 
 		if ( ! is_array( $stored ) ) {
@@ -362,7 +362,7 @@ class WP_CommentNavi_Options {
 	 * @return array
 	 */
 	public static function sanitize( $input ) {
-		$defaults = self::get_defaults();
+		$defaults = self::defaults();
 
 		// Keep only keys the plugin actually defines. Without this a hand-crafted
 		// post to options.php would have its extra keys stored in the option row
@@ -399,7 +399,7 @@ class WP_CommentNavi_Options {
 	 * @return void
 	 */
 	public static function maybe_upgrade() {
-		$versions = self::get_versions();
+		$versions = self::markers();
 
 		if ( WP_COMMENTNAVI_VERSION === $versions['plugin'] && WP_COMMENTNAVI_DB_VERSION === $versions['db'] ) {
 			return;
@@ -428,7 +428,7 @@ class WP_CommentNavi_Options {
 	 * equal the defaults writes nothing at all, while the legacy rows it read
 	 * are deleted anyway.
 	 *
-	 * **This plugin passes no `default`** -- WP_CommentNavi_Settings::register_settings()
+	 * **This plugin passes no `default`** -- WP_CommentNavi_Settings::register()
 	 * passes `type` and `sanitize_callback` only -- so no
 	 * `default_option_wp_commentnavi_options` filter exists here and the trap is
 	 * not armed. The helper is written this way regardless, so that adding one

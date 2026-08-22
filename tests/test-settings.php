@@ -13,7 +13,7 @@ class WP_CommentNavi_Settings_Test extends WP_CommentNavi_TestCase {
 	/**
 	 * Render one registered settings field and return its markup.
 	 *
-	 * The callback is looked up the same way register_settings() registers it,
+	 * The callback is looked up the same way register() registers it,
 	 * so a field renamed in one place and not the other fails here.
 	 *
 	 * @param string $name Option key.
@@ -35,7 +35,7 @@ class WP_CommentNavi_Settings_Test extends WP_CommentNavi_TestCase {
 
 		WP_CommentNavi_Options::update(
 			array_merge(
-				WP_CommentNavi_Options::get_defaults(),
+				WP_CommentNavi_Options::defaults(),
 				array(
 					'dotleft_text'  => 'LEFTDOTS',
 					'dotright_text' => 'RIGHTDOTS',
@@ -91,14 +91,14 @@ class WP_CommentNavi_Settings_Test extends WP_CommentNavi_TestCase {
 		// hand-crafted request.
 
 		WP_CommentNavi_Options::update(
-			array_merge( WP_CommentNavi_Options::get_defaults(), array( 'num_pages' => 11 ) )
+			array_merge( WP_CommentNavi_Options::defaults(), array( 'num_pages' => 11 ) )
 		);
 
 		$clean = WP_CommentNavi_Options::sanitize( array( 'style' => 2 ) );
 
 		$this->assertSame( 2, $clean['style'], 'The value is read from the posted form rather than the stored row.' );
 		$this->assertSame(
-			WP_CommentNavi_Options::get_defaults()['num_pages'],
+			WP_CommentNavi_Options::defaults()['num_pages'],
 			$clean['num_pages'],
 			'the sanitiser reached back into the stored row instead of the defaults.'
 		);
@@ -131,7 +131,7 @@ class WP_CommentNavi_Settings_Test extends WP_CommentNavi_TestCase {
 	public function test_current_values_are_preselected() {
 		WP_CommentNavi_Options::update(
 			array_merge(
-				WP_CommentNavi_Options::get_defaults(),
+				WP_CommentNavi_Options::defaults(),
 				array(
 					'style'       => 2,
 					'always_show' => 1,
@@ -149,7 +149,7 @@ class WP_CommentNavi_Settings_Test extends WP_CommentNavi_TestCase {
 	public function test_text_field_escapes_its_value() {
 		WP_CommentNavi_Options::update(
 			array_merge(
-				WP_CommentNavi_Options::get_defaults(),
+				WP_CommentNavi_Options::defaults(),
 				array( 'first_text' => 'x" onfocus="XSSPROBE' )
 			)
 		);
@@ -216,8 +216,8 @@ class WP_CommentNavi_Settings_Test extends WP_CommentNavi_TestCase {
 
 		// Compared as sets, not in order: fields() is in the order the screen has
 		// always shown the settings in, which is a deliberate choice, and
-		// get_defaults() has no order worth coupling it to.
-		$expected = array_keys( WP_CommentNavi_Options::get_defaults() );
+		// defaults() has no order worth coupling it to.
+		$expected = array_keys( WP_CommentNavi_Options::defaults() );
 		$actual   = array_keys( $fields );
 		sort( $expected );
 		sort( $actual );

@@ -18,7 +18,7 @@ class WP_CommentNavi_Core {
 	 * @return void
 	 */
 	public static function init() {
-		add_action( 'wp_enqueue_scripts', array( __CLASS__, 'stylesheets' ) );
+		add_action( 'wp_enqueue_scripts', array( __CLASS__, 'enqueue_styles' ) );
 	}
 
 	/**
@@ -35,7 +35,7 @@ class WP_CommentNavi_Core {
 	 *
 	 * @return void
 	 */
-	public static function stylesheets() {
+	public static function enqueue_styles() {
 		if ( ! WP_CommentNavi_Options::get( 'use_commentnavi_css' ) ) {
 			return;
 		}
@@ -48,7 +48,7 @@ class WP_CommentNavi_Core {
 			$css_file = WP_COMMENTNAVI_URL . 'css/wp-commentnavi.css';
 		}
 
-		wp_enqueue_style( WP_COMMENTNAVI_SLUG, $css_file, array(), WP_COMMENTNAVI_VERSION );
+		wp_enqueue_style( 'wp-commentnavi', $css_file, array(), WP_COMMENTNAVI_VERSION );
 	}
 
 	/**
