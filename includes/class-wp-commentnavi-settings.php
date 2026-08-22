@@ -68,7 +68,7 @@ class WP_CommentNavi_Settings {
 	const SECTION_DISPLAY = 'wp_commentnavi_display';
 
 	/**
-	 * Hook the admin screen into WordPress.
+	 * Hook registration.
 	 *
 	 * @return void
 	 */
@@ -91,7 +91,7 @@ class WP_CommentNavi_Settings {
 	 */
 	public static function capability( $context = 'settings' ) {
 		/**
-		 * Filters the capability required to manage the plugin.
+		 * Filters the capability required to reach a WP-CommentNavi screen.
 		 *
 		 * @since 2.0.0
 		 *

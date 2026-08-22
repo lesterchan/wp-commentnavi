@@ -13,7 +13,7 @@ defined( 'ABSPATH' ) || exit;
 class WP_CommentNavi_Core {
 
 	/**
-	 * Hook the plugin into WordPress.
+	 * Hook registration.
 	 *
 	 * @return void
 	 */
