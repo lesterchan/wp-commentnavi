@@ -13,7 +13,7 @@
 /**
  * Covers output escaping and missing-option handling in wp_commentnavi().
  */
-class WP_CommentNavi_Security_Test extends WP_CommentNavi_TestCase {
+class WP_CommentNavi_Escaping_Test extends WP_CommentNavi_TestCase {
 
 	/**
 	 * Assert that no element in the markup carries an inline event handler.
