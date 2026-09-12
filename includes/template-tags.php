@@ -31,7 +31,7 @@ defined( 'ABSPATH' ) || exit;
  *     @type object $query         Query to paginate. Default the main query.
  *     @type bool   $echo          Whether to print the markup. Default true.
  * }
- * @return string|void The markup when 'echo' is false, otherwise nothing.
+ * @return string|null The markup when 'echo' is false, otherwise null.
  */
 function wp_commentnavi( $args = array() ) {
 	if ( ! is_array( $args ) ) {
